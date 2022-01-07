@@ -2,7 +2,7 @@
 ![软件截图](screenshot.png)
 
 ## Features
-- 支持深度扫描 RJ 文件夹
+- 支持深度查找 RJ 文件夹
 - 支持手动选择文件夹或拖拽文件夹到软件窗口
 - 支持在 ```config.json``` 中设置软件配置
 - 支持在 ```cache.db``` 中缓存从 [dlsite.com](https://www.dlsite.com/maniax/) 抓取的元数据
