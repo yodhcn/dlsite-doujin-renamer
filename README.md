@@ -2,7 +2,7 @@
 ![软件截图](screenshot.png)
 
 ## Features
-- 支持深度查找 RJ 文件夹
+- 支持深度查找带有 RJ 号的文件夹
 - 支持手动选择文件夹或拖拽文件夹到软件窗口
 - 支持在 ```config.json``` 中设置软件配置
 - 支持在 ```cache.db``` 中缓存从 [dlsite.com](https://www.dlsite.com/maniax/) 抓取的元数据
@@ -35,10 +35,8 @@
   - ```release_date``` 同人作品的发售日期
   - ```cv_list_str``` 同人作品的声优列表
  
-  例如：```"renamer_template": "[maker_name] work_name (rjcode)"```
-  
-  重命名前：RJ149268 哀しみのイき人形
-  
+  例如：```"renamer_template": "[maker_name] work_name (rjcode)"```<br/>
+  重命名前：RJ149268 哀しみのイき人形<br/>
   重命名后：[Hypnotic_Yanh] 哀しみのイき人形《催眠音声・男女版同梱》 (RJ149268)
 - ```renamer_exclude_square_brackets_in_work_name_flag``` 命名器的 ```work_name``` 中是否排除 ```【】``` 及其间的内容
 
