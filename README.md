@@ -34,10 +34,14 @@
   - ```maker_name``` 同人作品的社团名称
   - ```release_date``` 同人作品的发售日期
   - ```cv_list_str``` 同人作品的声优列表
- 
-  例如：```"renamer_template": "[maker_name] work_name (rjcode)"```<br/>
-  重命名前：RJ149268 哀しみのイき人形<br/>
-  重命名后：[Hypnotic_Yanh] 哀しみのイき人形《催眠音声・男女版同梱》 (RJ149268)
-- ```renamer_exclude_square_brackets_in_work_name_flag``` 命名器的 ```work_name``` 中是否排除 ```【】``` 及其间的内容
 
-【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器**。本软件的配置文件 ```config.json``` 使用**不带 BOM 的标准 UTF-8** 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
+  例如：```"renamer_template": "[maker_name] work_name (rjcode)"```<br/>
+  重命名前：```RJ149268 哀しみのイき人形```<br/>
+  重命名后：```[Hypnotic_Yanh] 哀しみのイき人形《催眠音声・男女版同梱》 (RJ149268)```
+- ```renamer_exclude_square_brackets_in_work_name_flag``` 命名器的 ```work_name``` 中是否排除 ```【】``` 及其间的内容。例如：
+  - ```"renamer_exclude_square_brackets_in_work_name_flag": true```<br/>
+    ```work_name = "道草屋 なつな2 隣の部屋のたぬきさん。"```
+  - ```"renamer_exclude_square_brackets_in_work_name_flag": false```<br/>
+    ```work_name = "【お隣り耳噛み】道草屋 なつな2 隣の部屋のたぬきさん。【お隣り耳かき】"```
+
+【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 ```config.json``` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
