@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-from numpy import append
 
 from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout
 
