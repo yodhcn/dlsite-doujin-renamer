@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import os
 import sys
@@ -14,7 +15,7 @@ from scraper import Locale, CachedScraper
 from my_frame import MyFrame
 from wx_log_handler import EVT_WX_LOG_EVENT, WxLogHandler
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 
 class MyFileDropTarget(wx.FileDropTarget):
@@ -156,13 +157,20 @@ class AppFrame(MyFrame):
             read_timeout=scraper_read_timeout,
             sleep_interval=scraper_sleep_interval,
             proxies=proxies)
+        tags_option = {
+            'ordered_list': config['renamer_tags_ordered_list'],
+            'max_number': 999999 if config['renamer_tags_max_number'] == 0 else config['renamer_tags_max_number'],
+            'delimiter': config['renamer_tags_delimiter'],
+        }
 
         # 配置 renamer
         renamer = Renamer(
             scaner=scaner,
             scraper=cached_scraper,
             template=config['renamer_template'],
-            exclude_square_brackets_in_work_name_flag=config['renamer_exclude_square_brackets_in_work_name_flag'])
+            exclude_square_brackets_in_work_name_flag=config['renamer_exclude_square_brackets_in_work_name_flag'],
+            renamer_illegal_character_to_full_width_flag=config['renamer_illegal_character_to_full_width_flag'],
+            tags_option=tags_option)
 
         # 执行重命名
         for root_path in root_path_list:
