@@ -28,8 +28,8 @@ class ConfigFile(object):
         'renamer_template': '[maker_name][rjcode] work_name cv_list_str',
         'renamer_exclude_square_brackets_in_work_name_flag': False,
         'renamer_illegal_character_to_full_width_flag': False,
+        'renamer_delimiter': " ",  # 分隔符
         'renamer_tags_max_number': 5,  # 标签个数上限
-        'renamer_tags_delimiter': ",",  # 标签分隔符
         'renamer_tags_ordered_list': ["标签1", ["标签2", "替换2"], "标签3"],  # 标签顺序列表，每一项可为字符串或[原标签,替换名]
     }
 
@@ -75,7 +75,7 @@ class ConfigFile(object):
             config_dict.get('renamer_illegal_character_to_full_width_flag', None)
         renamer_tags_ordered_list = config_dict.get('renamer_tags_ordered_list', None)
         renamer_tags_max_number = config_dict.get('renamer_tags_max_number', None)
-        renamer_tags_delimiter = config_dict.get('renamer_tags_delimiter', None)
+        renamer_delimiter = config_dict.get('renamer_delimiter', None)
 
         strerror_list = []
 
@@ -140,12 +140,12 @@ class ConfigFile(object):
         if not isinstance(renamer_tags_max_number, int) or renamer_tags_max_number < 0:
             strerror_list.append('renamer_tags_max_number 应是大于等于 0 的整数。0为无限制')
 
-        # 检查 renamer_tags_delimiter
-        if not isinstance(renamer_tags_delimiter, str):
-            strerror_list.append('renamer_tags_delimiter 应是一个字符串')
+        # 检查 renamer_delimiter
+        if not isinstance(renamer_delimiter, str):
+            strerror_list.append('renamer_delimiter 应是一个字符串')
         else:
-            for i in renamer_tags_delimiter:
+            for i in renamer_delimiter:
                 if i in '[\\/*?:"<>|]':
-                    strerror_list.append(f'renamer_tags_delimiter 不能含有系统保留字【{i}】')
+                    strerror_list.append(f'renamer_delimiter 不能含有系统保留字【{i}】')
 
         return strerror_list

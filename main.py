@@ -160,7 +160,6 @@ class AppFrame(MyFrame):
         tags_option = {
             'ordered_list': config['renamer_tags_ordered_list'],
             'max_number': 999999 if config['renamer_tags_max_number'] == 0 else config['renamer_tags_max_number'],
-            'delimiter': config['renamer_tags_delimiter'],
         }
 
         # 配置 renamer
@@ -168,6 +167,7 @@ class AppFrame(MyFrame):
             scaner=scaner,
             scraper=cached_scraper,
             template=config['renamer_template'],
+            delimiter=config['renamer_delimiter'],
             exclude_square_brackets_in_work_name_flag=config['renamer_exclude_square_brackets_in_work_name_flag'],
             renamer_illegal_character_to_full_width_flag=config['renamer_illegal_character_to_full_width_flag'],
             tags_option=tags_option)
