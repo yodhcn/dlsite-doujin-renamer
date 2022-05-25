@@ -145,7 +145,7 @@ class ConfigFile(object):
             strerror_list.append('renamer_delimiter 应是一个字符串')
         else:
             for i in renamer_delimiter:
-                if i in '[\\/*?:"<>|]':
+                if i in r'\/:*?"<>|':
                     strerror_list.append(f'renamer_delimiter 不能含有系统保留字【{i}】')
 
         return strerror_list
