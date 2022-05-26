@@ -19,6 +19,8 @@ from scraper import WorkMetadata, Scraper
 # ? （问号）
 # * (星号)
 WINDOWS_RESERVED_CHARACTER_PATTERN = re.compile(r'[\\/*?:"<>|]')
+WINDOWS_RESERVED_CHARACTER_PATTERN_str = r'\/:*?"<>|'  # 半角字符，原
+WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str = '＼／：＊？＂＜＞｜'  # 全角字符，替
 
 
 def _get_logger():
@@ -48,14 +50,20 @@ class Renamer(object):
             scaner: Scaner,
             scraper: Scraper,
             template: str = '[maker_name][rjcode] work_name cv_list_str',  # 模板
+            delimiter: str = ' ',  # 列表转字符串的分隔符
             exclude_square_brackets_in_work_name_flag: bool = False,  # 设为 True 时，移除 work_name 中【】及其间的内容
+            renamer_illegal_character_to_full_width_flag: bool = False,  # 设为 True 时，新文件名将非法字符转为全角；为 False 时直接移除.
+            tags_option: dict = None,  # 标签相关设置
     ):
         if 'rjcode' not in template:
             raise ValueError  # 重命名不能丢失 rjcode
         self.__scaner = scaner
         self.__scraper = scraper
         self.__template = template
+        self.__delimiter = delimiter
         self.__exclude_square_brackets_in_work_name_flag = exclude_square_brackets_in_work_name_flag
+        self.__renamer_illegal_character_to_full_width_flag = renamer_illegal_character_to_full_width_flag
+        self.__tags_option = tags_option
 
     def __compile_new_name(self, metadata: WorkMetadata):
         """
@@ -72,12 +80,33 @@ class Renamer(object):
         new_name = new_name.replace('maker_name', metadata['maker_name'])
         new_name = new_name.replace('release_date', metadata['release_date'])
 
-        cv_list = metadata['cvs']
-        cv_list_str = '(' + ' '.join(cv_list) + ')' if len(cv_list) > 0 else ''
+        cv_list = metadata['cvs']  # cv列表
+        cv_list_str = '(' + self.__delimiter.join(cv_list) + ')' if len(cv_list) > 0 else ''
         new_name = new_name.replace('cv_list_str', cv_list_str)
 
+        if "tags_list_str" in self.__template:  # 标签列表
+            tags_list = []
+            tags_list_flag = []
+            for i in self.__tags_option['ordered_list']:  # ordered_list中存在的标签
+                if isinstance(i, str) and i in metadata['tags']:
+                    tags_list.append(i)
+                    tags_list_flag.append(i)
+                elif isinstance(i, list) and i[0] in metadata['tags']:
+                    tags_list.append(i[1])  # 替换新标签
+                    tags_list_flag.append(i[0])
+            for i in metadata['tags']:  # 剩余的标签
+                if not i in tags_list_flag:
+                    tags_list.append(i)
+            tags_list = tags_list[: self.__tags_option['max_number']]  # 数量限制
+            tags_list_str = self.__delimiter.join(tags_list)  # 转字符串，加分隔符
+            new_name = new_name.replace('tags_list_str', tags_list_str)
+
         # 文件名中不能包含 Windows 系统的保留字符
-        new_name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', new_name)
+        if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+            new_name = new_name.translate(new_name.maketrans(
+                WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
+        else:  # 直接移除
+            new_name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', new_name)
 
         return new_name.strip()
 

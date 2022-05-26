@@ -27,6 +27,10 @@ class ConfigFile(object):
         'scraper_http_proxy': None,
         'renamer_template': '[maker_name][rjcode] work_name cv_list_str',
         'renamer_exclude_square_brackets_in_work_name_flag': False,
+        'renamer_illegal_character_to_full_width_flag': False,
+        'renamer_delimiter': " ",  # 分隔符
+        'renamer_tags_max_number': 5,  # 标签个数上限
+        'renamer_tags_ordered_list': ["标签1", ["标签2", "替换2"], "标签3"],  # 标签顺序列表，每一项可为字符串或[原标签,替换名]
     }
 
     def __init__(self, file_path: str):
@@ -67,6 +71,11 @@ class ConfigFile(object):
         renamer_template = config_dict.get('renamer_template', None)
         renamer_exclude_square_brackets_in_work_name_flag = \
             config_dict.get('renamer_exclude_square_brackets_in_work_name_flag', None)
+        renamer_illegal_character_to_full_width_flag = \
+            config_dict.get('renamer_illegal_character_to_full_width_flag', None)
+        renamer_tags_ordered_list = config_dict.get('renamer_tags_ordered_list', None)
+        renamer_tags_max_number = config_dict.get('renamer_tags_max_number', None)
+        renamer_delimiter = config_dict.get('renamer_delimiter', None)
 
         strerror_list = []
 
@@ -111,5 +120,32 @@ class ConfigFile(object):
         # 检查 renamer_exclude_square_brackets_in_work_name_flag
         if not isinstance(renamer_exclude_square_brackets_in_work_name_flag, bool):
             strerror_list.append('renamer_exclude_square_brackets_in_work_name_flag 应是一个布尔值')
+
+        # 检查 renamer_illegal_character_to_full_width_flag
+        if not isinstance(renamer_illegal_character_to_full_width_flag, bool):
+            strerror_list.append('renamer_illegal_character_to_full_width_flag 应是一个布尔值')
+
+        # 检查 renamer_tags_ordered_list
+        if not isinstance(renamer_tags_ordered_list, list):
+            strerror_list.append('renamer_tags_ordered_list 应是一个列表，其中每个元素是"标签名"或["标签名","替换名"]')
+        else:
+            for i in renamer_tags_ordered_list:
+                if isinstance(i, list):
+                    if not len(i) == 2 or not isinstance(i[0], str) or not isinstance(i[1], str):
+                        strerror_list.append(f'renamer_tags_ordered_list 中每个元素应是"标签名"或["标签名","替换名"]，不能为【{i}】')
+                elif not isinstance(i, str):
+                    strerror_list.append(f'renamer_tags_ordered_list 中每个元素应是"标签名"或["标签名","替换名"]，不能为【{i}】')
+
+        # 检查 renamer_tags_max_number
+        if not isinstance(renamer_tags_max_number, int) or renamer_tags_max_number < 0:
+            strerror_list.append('renamer_tags_max_number 应是大于等于 0 的整数。0为无限制')
+
+        # 检查 renamer_delimiter
+        if not isinstance(renamer_delimiter, str):
+            strerror_list.append('renamer_delimiter 应是一个字符串')
+        else:
+            for i in renamer_delimiter:
+                if i in r'\/:*?"<>|':
+                    strerror_list.append(f'renamer_delimiter 不能含有系统保留字【{i}】')
 
         return strerror_list

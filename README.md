@@ -18,7 +18,15 @@
   "scraper_sleep_interval": 3,
   "scraper_http_proxy": null,
   "renamer_template": "[maker_name][rjcode] work_name cv_list_str",
-  "renamer_exclude_square_brackets_in_work_name_flag": false
+  "renamer_exclude_square_brackets_in_work_name_flag": false,
+  "renamer_illegal_character_to_full_width_flag": false,
+  "renamer_delimiter": " ",
+  "renamer_tags_max_number": 5,
+  "renamer_tags_ordered_list": [
+    "标签1",
+    ["标签2","替换2"],
+    "标签3"
+  ]
 }
 ```
 - ```scaner_max_depth``` 扫描器的扫描深度
@@ -34,14 +42,34 @@
   - ```maker_name``` 同人作品的社团名称
   - ```release_date``` 同人作品的发售日期
   - ```cv_list_str``` 同人作品的声优列表
+  - ```tags_list_str``` 同人作品的标签（分类）列表
 
-  例如：```"renamer_template": "[maker_name] work_name (rjcode)"```<br/>
-  重命名前：```RJ149268 哀しみのイき人形```<br/>
-  重命名后：```[Hypnotic_Yanh] 哀しみのイき人形《催眠音声・男女版同梱》 (RJ149268)```
+  例如：```"renamer_template": "[maker_name] work_name (rjcode)[tags_list_str]"```<br/>
+  重命名前：```RJ298293 蓄音レヱル 紅```<br/>
+  重命名后：```[RaRo] 蓄音レヱル 紅 (RJ298293)[萌 感动 治愈 环绕音]```
 - ```renamer_exclude_square_brackets_in_work_name_flag``` 命名器的 ```work_name``` 中是否排除 ```【】``` 及其间的内容。例如：
   - ```"renamer_exclude_square_brackets_in_work_name_flag": true```<br/>
     ```work_name = "道草屋 なつな2 隣の部屋のたぬきさん。"```
   - ```"renamer_exclude_square_brackets_in_work_name_flag": false```<br/>
     ```work_name = "【お隣り耳噛み】道草屋 なつな2 隣の部屋のたぬきさん。【お隣り耳かき】"```
+- ```renamer_illegal_character_to_full_width_flag``` 命名器的新文件名中的非法字符（windows保留字）如何处理。`true`为全角化，`false`为直接删除。例如：
+  - ```"renamer_illegal_character_to_full_width_flag": true```<br/>
+    `文/件*名` → `文／件＊名`
+  - ```"renamer_illegal_character_to_full_width_flag": false```<br/>
+    `文/件*名` → `文件名`
+- ```renamer_delimiter``` 命名器将列表转为字符串时的分隔符，作用于`cv_list_str`和`tags_list_str`。
+- ```renamer_tags_max_number``` 命名器向文件名中写入标签的最大个数
+- ```renamer_tags_ordered_list``` 命名器向文件名中写入标签的优先顺序和替换标签。列表。每一项若是字符串，则为匹配的标签。若是二元列表，则为`["匹配的标签","替换的标签"]`。例如：
+  - ```
+    "renamer_delimiter": ",",
+    "renamer_tags_max_number": 4,
+    "renamer_tags_ordered_list": [
+        "标签1",
+        ["标签2","替换2"],
+        "标签3"
+    ]
+    ```
+  - 作品含有的标签：`标签6` `标签5` `标签4` `标签3` `标签2` `标签1`
+  - 文件名中的标签：`标签1,替换2,标签3,标签6`
 
 【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 ```config.json``` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
