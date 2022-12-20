@@ -15,7 +15,7 @@ from scraper import Locale, CachedScraper
 from my_frame import MyFrame
 from wx_log_handler import EVT_WX_LOG_EVENT, WxLogHandler
 
-VERSION = '0.1.1'
+VERSION = '0.2.0'
 
 
 class MyFileDropTarget(wx.FileDropTarget):
@@ -168,8 +168,12 @@ class AppFrame(MyFrame):
             scraper=cached_scraper,
             template=config['renamer_template'],
             delimiter=config['renamer_delimiter'],
+            cv_list_left=config['cv_list_left'],
+            cv_list_right=config['cv_list_right'],
             exclude_square_brackets_in_work_name_flag=config['renamer_exclude_square_brackets_in_work_name_flag'],
             renamer_illegal_character_to_full_width_flag=config['renamer_illegal_character_to_full_width_flag'],
+            make_folder_icon=config['make_folder_icon'],
+            remove_jpg_file=config['remove_jpg_file'],
             tags_option=tags_option)
 
         # 执行重命名
