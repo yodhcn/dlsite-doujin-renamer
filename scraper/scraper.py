@@ -156,15 +156,16 @@ class Scraper(object):
         rjcode = rjcode.upper()
         if not Dlsite.RJCODE_PATTERN.fullmatch(rjcode):
             raise ValueError
-        html = self.__request_work_page(rjcode)
-        imgurl = self.__parse_icon(html)
-        jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
-        urllib.request.urlretrieve(imgurl, jpg_path) # 爬取作品图片
-        image = img.open(jpg_path)
         icon_path = os.path.join(icon_dir + "\\@folder-icon-" + rjcode + '.ico')
-        x, y = image.size
-        size = max(x, y)
-        new_im = img.new('RGBA', (size, size), (255, 255, 255, 0))
-        new_im.paste(image, ((size - x) // 2, (size - y) // 2))
-        new_im.save(icon_path)
-        return jpg_path # 返回值用于后续删存操作
+        if not os.path.exists(icon_path):
+            html = self.__request_work_page(rjcode)
+            imgurl = self.__parse_icon(html)
+            jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
+            urllib.request.urlretrieve(imgurl, jpg_path) # 爬取作品图片
+            image = img.open(jpg_path)
+            x, y = image.size
+            size = max(x, y)
+            new_im = img.new('RGBA', (size, size), (255, 255, 255, 0))
+            new_im.paste(image, ((size - x) // 2, (size - y) // 2))
+            new_im.save(icon_path)
+            return jpg_path # 返回值用于后续删存操作

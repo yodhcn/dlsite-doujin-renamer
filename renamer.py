@@ -159,21 +159,23 @@ class Renamer(object):
 
     # 修改文件夹封面
     def changeIcon(self, rjcode: str, icon_dir: str):
-        jpg_path = self.__scraper.scrape_icon(rjcode, icon_dir)
         os.chmod(icon_dir, stat.S_IREAD)
-        icon_name = "@folder-icon-" + rjcode + ".ico"
-        iniline1 = "[.ShellClassInfo]"
-        iniline2 = "IconResource=" + "\"" + icon_name + "\"" +  ",0"
-        iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
-        iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
-        with open(icon_dir + "\\" + "desktop.ini", "w+",encoding='utf-8') as inifile:
-            inifile.write(iniline)
-            inifile.close()
-        cmd1 = icon_dir[0:2]
-        cmd2 = "cd " + '\"' + icon_dir + '\"'
-        cmd3 = "attrib +h +s " + 'desktop.ini'
-        cmd4 = "attrib +h +s " + icon_name
-        cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
-        os.system(cmd)
-        if self.__remove_jpg_file:
-            os.remove(jpg_path)
+        ini_path = icon_dir + "\\" + "desktop.ini"
+        if not os.path.exists(ini_path):
+            jpg_path = self.__scraper.scrape_icon(rjcode, icon_dir)
+            icon_name = "@folder-icon-" + rjcode + ".ico"
+            iniline1 = "[.ShellClassInfo]"
+            iniline2 = "IconResource=" + "\"" + icon_name + "\"" +  ",0"
+            iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
+            iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
+            with open(ini_path, "w+",encoding='utf-8') as inifile:
+                inifile.write(iniline)
+                inifile.close()
+            cmd1 = icon_dir[0:2]
+            cmd2 = "cd " + '\"' + icon_dir + '\"'
+            cmd3 = "attrib +h +s " + 'desktop.ini'
+            cmd4 = "attrib +h +s " + icon_name
+            cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
+            os.system(cmd)
+            if self.__remove_jpg_file:
+                os.remove(jpg_path)
