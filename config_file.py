@@ -28,7 +28,11 @@ class ConfigFile(object):
         'renamer_template': '[maker_name][rjcode] work_name cv_list_str',
         'renamer_exclude_square_brackets_in_work_name_flag': False,
         'renamer_illegal_character_to_full_width_flag': False,
+        'make_folder_icon': True,
+        'remove_jpg_file': True,
         'renamer_delimiter': " ",  # 分隔符
+        'cv_list_left': "(CV ",
+        'cv_list_right': ")",
         'renamer_tags_max_number': 5,  # 标签个数上限
         'renamer_tags_ordered_list': ["标签1", ["标签2", "替换2"], "标签3"],  # 标签顺序列表，每一项可为字符串或[原标签,替换名]
     }
@@ -73,9 +77,15 @@ class ConfigFile(object):
             config_dict.get('renamer_exclude_square_brackets_in_work_name_flag', None)
         renamer_illegal_character_to_full_width_flag = \
             config_dict.get('renamer_illegal_character_to_full_width_flag', None)
+        make_folder_icon = \
+            config_dict.get('make_folder_icon', None)
+        remove_jpg_file = \
+            config_dict.get('remove_jpg_file', None)
         renamer_tags_ordered_list = config_dict.get('renamer_tags_ordered_list', None)
         renamer_tags_max_number = config_dict.get('renamer_tags_max_number', None)
         renamer_delimiter = config_dict.get('renamer_delimiter', None)
+        cv_list_left = config_dict.get('cv_list_left', None)
+        cv_list_right = config_dict.get('cv_list_right', None)
 
         strerror_list = []
 
@@ -125,6 +135,14 @@ class ConfigFile(object):
         if not isinstance(renamer_illegal_character_to_full_width_flag, bool):
             strerror_list.append('renamer_illegal_character_to_full_width_flag 应是一个布尔值')
 
+        # 检查 make_folder_icon
+        if not isinstance(make_folder_icon, bool):
+            strerror_list.append('make_folder_icon 应是一个布尔值')
+
+        # 检查 remove_jpg_file
+        if not isinstance(remove_jpg_file, bool):
+            strerror_list.append('remove_jpg_file 应是一个布尔值')
+
         # 检查 renamer_tags_ordered_list
         if not isinstance(renamer_tags_ordered_list, list):
             strerror_list.append('renamer_tags_ordered_list 应是一个列表，其中每个元素是"标签名"或["标签名","替换名"]')
@@ -147,5 +165,21 @@ class ConfigFile(object):
             for i in renamer_delimiter:
                 if i in r'\/:*?"<>|':
                     strerror_list.append(f'renamer_delimiter 不能含有系统保留字【{i}】')
+
+        # 检查 cv_list_left
+        if not isinstance(cv_list_left, str):
+            strerror_list.append('cv_list_left 应是一个字符串')
+        else:
+            for i in cv_list_left:
+                if i in r'\/:*?"<>|':
+                    strerror_list.append(f'cv_list_left 不能含有系统保留字【{i}】')
+
+        # 检查 cv_list_right
+        if not isinstance(cv_list_right, str):
+            strerror_list.append('cv_list_right 应是一个字符串')
+        else:
+            for i in cv_list_right:
+                if i in r'\/:*?"<>|':
+                    strerror_list.append(f'cv_list_right 不能含有系统保留字【{i}】')
 
         return strerror_list
