@@ -2,6 +2,7 @@ import re
 import os
 import contextlib
 import time
+from pathlib import Path
 from urllib.request import getproxies
 from typing import Union
 
@@ -175,10 +176,11 @@ class Scraper(object):
         jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
         self.urlretrieve(imgurl, jpg_path) # 爬取作品图片
         image = img.open(jpg_path)
-        icon_path = os.path.join(icon_dir + "\\@folder-icon-" + rjcode + '.ico')
+        icon_path = Path(os.path.join(icon_dir, f'@folder-icon-{rjcode}.ico'))
         x, y = image.size
         size = max(x, y)
         new_im = img.new('RGBA', (size, size), (255, 255, 255, 0))
         new_im.paste(image, ((size - x) // 2, (size - y) // 2))
+        icon_path.unlink(missing_ok=True)  # 删除旧的 .ico 文件
         new_im.save(icon_path)
         return jpg_path # 返回值用于后续删存操作

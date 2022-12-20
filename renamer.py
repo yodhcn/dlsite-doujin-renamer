@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from pathlib import Path
 
 from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout
 
@@ -166,9 +167,13 @@ class Renamer(object):
         iniline2 = "IconResource=" + "\"" + icon_name + "\"" +  ",0"
         iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
         iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
-        with open(icon_dir + "\\" + "desktop.ini", "w+",encoding='utf-8') as inifile:
+
+        inifile_path = Path(os.path.join(icon_dir, "desktop.ini"))
+        inifile_path.unlink(missing_ok=True)  # 删除旧的 .ini 文件
+        with open(inifile_path, "w", encoding='utf-8') as inifile:
             inifile.write(iniline)
             inifile.close()
+
         cmd1 = icon_dir[0:2]
         cmd2 = "cd " + '\"' + icon_dir + '\"'
         cmd3 = "attrib +h +s " + 'desktop.ini'
