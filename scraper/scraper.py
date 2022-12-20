@@ -1,8 +1,9 @@
 import re
 import os
+import contextlib
 import time
 from urllib.request import getproxies
-import urllib.request
+from typing import Union
 
 import requests
 from pyquery import PyQuery as pq
@@ -151,6 +152,19 @@ class Scraper(object):
         work_icon_url = "https:" + work_icon_url_
         return work_icon_url
 
+    def urlretrieve(self, url: str,
+                    filename: Union[os.PathLike, str]) -> tuple[str, dict[str, str]]:
+        """"
+        https://gist.github.com/xflr6/f29ed682f23fd27b6a0b1241f244e6c9
+        """
+        with contextlib.closing(requests.get(url, stream=True, proxies=self.__proxies)) as r:
+            r.raise_for_status()
+            with open(filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8_192):
+                    f.write(chunk)
+
+        return filename, r.headers
+
     # 下载图片并生成.ico文件
     def scrape_icon(self, rjcode: str, icon_dir: str):
         rjcode = rjcode.upper()
@@ -159,7 +173,7 @@ class Scraper(object):
         html = self.__request_work_page(rjcode)
         imgurl = self.__parse_icon(html)
         jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
-        urllib.request.urlretrieve(imgurl, jpg_path) # 爬取作品图片
+        self.urlretrieve(imgurl, jpg_path) # 爬取作品图片
         image = img.open(jpg_path)
         icon_path = os.path.join(icon_dir + "\\@folder-icon-" + rjcode + '.ico')
         x, y = image.size
