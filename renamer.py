@@ -7,6 +7,8 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 from scaner import Scaner
 from scraper import WorkMetadata, Scraper
 
+import stat
+
 # Windows 系统的保留字符
 # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file
 # <（小于）
@@ -51,8 +53,12 @@ class Renamer(object):
             scraper: Scraper,
             template: str = '[maker_name][rjcode] work_name cv_list_str',  # 模板
             delimiter: str = ' ',  # 列表转字符串的分隔符
+            cv_list_left: str = ' ', # CV列表的左侧分隔符
+            cv_list_right: str = ' ', # CV列表的右侧分隔符
             exclude_square_brackets_in_work_name_flag: bool = False,  # 设为 True 时，移除 work_name 中【】及其间的内容
             renamer_illegal_character_to_full_width_flag: bool = False,  # 设为 True 时，新文件名将非法字符转为全角；为 False 时直接移除.
+            make_folder_icon: bool = True, # 设为 True 时，将会下载作品封面并将其设为文件夹封面
+            remove_jpg_file: bool = True, # 设为 True 时，将会保留下载的作品封面
             tags_option: dict = None,  # 标签相关设置
     ):
         if 'rjcode' not in template:
@@ -61,8 +67,12 @@ class Renamer(object):
         self.__scraper = scraper
         self.__template = template
         self.__delimiter = delimiter
+        self.__cv_list_left = cv_list_left
+        self.__cv_list_right = cv_list_right
         self.__exclude_square_brackets_in_work_name_flag = exclude_square_brackets_in_work_name_flag
         self.__renamer_illegal_character_to_full_width_flag = renamer_illegal_character_to_full_width_flag
+        self.__make_folder_icon = make_folder_icon
+        self.__remove_jpg_file = remove_jpg_file
         self.__tags_option = tags_option
 
     def __compile_new_name(self, metadata: WorkMetadata):
@@ -81,7 +91,7 @@ class Renamer(object):
         new_name = new_name.replace('release_date', metadata['release_date'])
 
         cv_list = metadata['cvs']  # cv列表
-        cv_list_str = '(' + self.__delimiter.join(cv_list) + ')' if len(cv_list) > 0 else ''
+        cv_list_str = self.__cv_list_left + self.__delimiter.join(cv_list) + self.__cv_list_right if len(cv_list) > 0 else ''
         new_name = new_name.replace('cv_list_str', cv_list_str)
 
         if "tags_list_str" in self.__template:  # 标签列表
@@ -133,7 +143,8 @@ class Renamer(object):
                 # requests 引发的其它异常
                 Renamer.logger.error(f'[{rjcode}] -> 重命名失败：{str(err)}\n')
                 continue
-
+            if self.__make_folder_icon:
+                Renamer.changeIcon(self, rjcode, root_path) # 修改封面
             new_basename = self.__compile_new_name(metadata)
             new_folder_path = os.path.join(dirname, new_basename)
             try:
@@ -145,3 +156,24 @@ class Renamer(object):
                 Renamer.logger.warning(f'[{rjcode}] -> 重命名失败：{err.strerror}："{filename}" -> "{filename2}"\n')
             except OSError as err:
                 Renamer.logger.error(f'[{rjcode}] -> 重命名失败：{str(err)}\n')
+
+    # 修改文件夹封面
+    def changeIcon(self, rjcode: str, icon_dir: str):
+        jpg_path = self.__scraper.scrape_icon(rjcode, icon_dir)
+        os.chmod(icon_dir, stat.S_IREAD)
+        icon_name = "@folder-icon-" + rjcode + ".ico"
+        iniline1 = "[.ShellClassInfo]"
+        iniline2 = "IconResource=" + "\"" + icon_name + "\"" +  ",0"
+        iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
+        iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
+        with open(icon_dir + "\\" + "desktop.ini", "w+",encoding='utf-8') as inifile:
+            inifile.write(iniline)
+            inifile.close()
+        cmd1 = icon_dir[0:2]
+        cmd2 = "cd " + '\"' + icon_dir + '\"'
+        cmd3 = "attrib +h +s " + 'desktop.ini'
+        cmd4 = "attrib +h +s " + icon_name
+        cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
+        os.system(cmd)
+        if self.__remove_jpg_file:
+            os.remove(jpg_path)

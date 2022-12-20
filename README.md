@@ -57,7 +57,10 @@
     `文/件*名` → `文／件＊名`
   - ```"renamer_illegal_character_to_full_width_flag": false```<br/>
     `文/件*名` → `文件名`
-- ```renamer_delimiter``` 命名器将列表转为字符串时的分隔符，作用于`cv_list_str`和`tags_list_str`。
+- ```make_folder_icon``` 是否将文件夹封面改为作品封面，`true` 为修改，`false` 反之
+- ```remove_jpg_file``` 是否保留文件夹中的作品封面图，`true` 为移除，`false` 为保留（不会消除文件夹封面）
+- ```renamer_delimiter``` 命名器将列表转为字符串时的分隔符，作用于 `cv_list_str` 和 `tags_list_str`
+- ```cv_list_left``` ```cv_list_right``` 命名器在声优列表左右外括的符号，作用于 `cv_list_str`
 - ```renamer_tags_max_number``` 命名器向文件名中写入标签的最大个数
 - ```renamer_tags_ordered_list``` 命名器向文件名中写入标签的优先顺序和替换标签。列表。每一项若是字符串，则为匹配的标签。若是二元列表，则为`["匹配的标签","替换的标签"]`。例如：
   - ```
