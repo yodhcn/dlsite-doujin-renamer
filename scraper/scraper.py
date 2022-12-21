@@ -175,7 +175,7 @@ class Scraper(object):
             html = self.__request_work_page(rjcode)
             imgurl = self.__parse_icon(html)
             jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
-            urllib.request.urlretrieve(imgurl, jpg_path) # 爬取作品图片
+            self.urlretrieve(imgurl, jpg_path) # 爬取作品图片
             image = img.open(jpg_path)
             x, y = image.size
             size = max(x, y)
