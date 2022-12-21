@@ -178,27 +178,29 @@ class Renamer(object):
     def changeIcon(self, rjcode: str, cover_url: str, icon_dir: str):
         os.chmod(icon_dir, stat.S_IREAD)
         icon_name, jpg_name = self.__scraper.scrape_icon(rjcode, cover_url, icon_dir)
+        icon_path = os.path.join(icon_dir, icon_name)
 
-        # 编写 desktop.ini
-        iniline1 = "[.ShellClassInfo]"
-        iniline2 = "IconResource=" + "\"" + icon_name + "\"" + ",0"
-        iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
-        iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
+        if not os.path.exists(icon_path):
+            # 编写 desktop.ini
+            iniline1 = "[.ShellClassInfo]"
+            iniline2 = "IconResource=" + "\"" + icon_name + "\"" + ",0"
+            iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
+            iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
 
-        # 写入 desktop.ini
-        inifile_path = Path(os.path.join(icon_dir, "desktop.ini"))
-        inifile_path.unlink(missing_ok=True)  # 删除旧的 .ini 文件
-        with open(inifile_path, "w", encoding='utf-8') as inifile:
-            inifile.write(iniline)
-            inifile.close()
+            # 写入 desktop.ini
+            inifile_path = Path(os.path.join(icon_dir, "desktop.ini"))
+            inifile_path.unlink(missing_ok=True)  # 删除旧的 .ini 文件
+            with open(inifile_path, "w", encoding='utf-8') as inifile:
+                inifile.write(iniline)
+                inifile.close()
 
-        # 编写 cmd
-        cmd1 = icon_dir[0:2]
-        cmd2 = "cd " + '\"' + icon_dir + '\"'
-        cmd3 = "attrib +h +s " + 'desktop.ini'
-        cmd4 = "attrib +h +s " + icon_name
-        cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
-        os.system(cmd)  # 运行 cmd
+            # 编写 cmd
+            cmd1 = icon_dir[0:2]
+            cmd2 = "cd " + '\"' + icon_dir + '\"'
+            cmd3 = "attrib +h +s " + 'desktop.ini'
+            cmd4 = "attrib +h +s " + icon_name
+            cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
+            os.system(cmd)  # 运行 cmd
 
         if self.__remove_jpg_file:
             # 删除 .jpg 文件
