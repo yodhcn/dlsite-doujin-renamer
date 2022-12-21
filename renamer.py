@@ -152,7 +152,7 @@ class Renamer(object):
             # 修改封面
             if self.__make_folder_icon:
                 try:
-                    icon_name = Renamer.changeIcon(self, rjcode, folder_path)  # 修改封面
+                    icon_name, _ = Renamer.changeIcon(self, rjcode, metadata['cover_url'], folder_path)  # 修改封面
                     Renamer.logger.info(f'[{rjcode}] -> 修改封面成功："{icon_name}"')
                 except RequestException as err:
                     Renamer.__handle_request_exception(rjcode, '下载封面图', err)  # 下载封面图失败
@@ -175,27 +175,34 @@ class Renamer(object):
                 Renamer.logger.error(f'[{rjcode}] -> 重命名失败[OSError]：{str(err)}\n')
 
     # 修改文件夹封面
-    def changeIcon(self, rjcode: str, icon_dir: str):
-        jpg_path = self.__scraper.scrape_icon(rjcode, icon_dir)
+    def changeIcon(self, rjcode: str, cover_url: str, icon_dir: str):
         os.chmod(icon_dir, stat.S_IREAD)
-        icon_name = "@folder-icon-" + rjcode + ".ico"
+        icon_name, jpg_name = self.__scraper.scrape_icon(rjcode, cover_url, icon_dir)
+
+        # 编写 desktop.ini
         iniline1 = "[.ShellClassInfo]"
-        iniline2 = "IconResource=" + "\"" + icon_name + "\"" +  ",0"
+        iniline2 = "IconResource=" + "\"" + icon_name + "\"" + ",0"
         iniline3 = "[ViewState]" + "\n" + "Mode=" + "\n" + "Vid=" + "\n" + "FolderType=StorageProviderGeneric"
         iniline = iniline1 + "\n" + iniline2 + "\n" + iniline3
 
+        # 写入 desktop.ini
         inifile_path = Path(os.path.join(icon_dir, "desktop.ini"))
         inifile_path.unlink(missing_ok=True)  # 删除旧的 .ini 文件
         with open(inifile_path, "w", encoding='utf-8') as inifile:
             inifile.write(iniline)
             inifile.close()
 
+        # 编写 cmd
         cmd1 = icon_dir[0:2]
         cmd2 = "cd " + '\"' + icon_dir + '\"'
         cmd3 = "attrib +h +s " + 'desktop.ini'
         cmd4 = "attrib +h +s " + icon_name
         cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
-        os.system(cmd)
+        os.system(cmd)  # 运行 cmd
+
         if self.__remove_jpg_file:
-            os.remove(jpg_path)
-        return icon_name
+            # 删除 .jpg 文件
+            jpg_path = Path(os.path.join(icon_dir, jpg_name))
+            jpg_path.unlink(missing_ok=True)
+
+        return icon_name, jpg_name

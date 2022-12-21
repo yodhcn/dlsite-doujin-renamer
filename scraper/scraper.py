@@ -64,7 +64,8 @@ class Scraper(object):
             'series_id': '',
             'age_category': '',
             'tags': [],
-            'cvs': []
+            'cvs': [],
+            'cover_url': self.__parse_icon(html)
         }
 
         # parse work_name
@@ -146,7 +147,8 @@ class Scraper(object):
         return metadata
     
     # 获取封面图片链接
-    def __parse_icon(self, html: str):
+    @staticmethod
+    def __parse_icon(html: str):
         d = pq(html)
         # parse icon
         work_icon_url_ = str(d('#work_left > div > div > div.product-slider-data > div:nth-child(1)').attr('data-src'))
@@ -166,21 +168,24 @@ class Scraper(object):
 
         return filename, r.headers
 
-    # 下载图片并生成.ico文件
-    def scrape_icon(self, rjcode: str, icon_dir: str):
-        rjcode = rjcode.upper()
-        if not Dlsite.RJCODE_PATTERN.fullmatch(rjcode):
-            raise ValueError
-        html = self.__request_work_page(rjcode)
-        imgurl = self.__parse_icon(html)
-        jpg_path = os.path.join(icon_dir + "\\" + rjcode + '.jpg')
-        self.urlretrieve(imgurl, jpg_path) # 爬取作品图片
-        image = img.open(jpg_path)
-        icon_path = Path(os.path.join(icon_dir, f'@folder-icon-{rjcode}.ico'))
-        x, y = image.size
-        size = max(x, y)
-        new_im = img.new('RGBA', (size, size), (255, 255, 255, 0))
-        new_im.paste(image, ((size - x) // 2, (size - y) // 2))
-        icon_path.unlink(missing_ok=True)  # 删除旧的 .ico 文件
-        new_im.save(icon_path)
-        return jpg_path # 返回值用于后续删存操作
+    def scrape_icon(self, rjcode: str, cover_url: str, icon_dir: str):
+        """
+        下载图片并生成.ico文件
+        """
+        icon_name = f'@folder-icon-{rjcode}.ico'
+        jpg_name = f'{rjcode}.jpg'
+        icon_path = Path(os.path.join(icon_dir, icon_name))
+        jpg_path = Path(os.path.join(icon_dir, jpg_name))
+
+        if not os.path.exists(icon_path):
+            self.urlretrieve(cover_url, jpg_path)  # 爬取作品图片
+
+            # 用 .jpg 文件生成 .ico 文件
+            image = img.open(jpg_path)
+            x, y = image.size
+            size = max(x, y)
+            new_im = img.new('RGBA', (size, size), (255, 255, 255, 0))
+            new_im.paste(image, ((size - x) // 2, (size - y) // 2))
+            new_im.save(icon_path)
+
+        return icon_name, jpg_name  # 返回值用于后续删存操作

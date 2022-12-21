@@ -13,3 +13,4 @@ class WorkMetadata(TypedDict):
     age_category: str
     tags: list[str]
     cvs: list[str]
+    cover_url: str
