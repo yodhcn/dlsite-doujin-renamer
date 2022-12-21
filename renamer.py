@@ -121,31 +121,47 @@ class Renamer(object):
 
         return new_name.strip()
 
+    @staticmethod
+    def __handle_request_exception(rjcode: str, task: str, err: RequestException):
+        if isinstance(err, Timeout):
+            # 请求超时
+            Renamer.logger.warning(f'[{rjcode}] -> {task}失败[Timeout]：dlsite.com 请求超时！\n')
+        elif isinstance(err, ConnectionError):
+            # 遇到其它网络问题（如：DNS 查询失败、拒绝连接等）
+            Renamer.logger.warning(f'[{rjcode}] -> {task}失败[ConnectionError]：{str(err)}\n')
+        elif isinstance(err, HTTPError):
+            # HTTP 请求返回了不成功的状态码
+            Renamer.logger.warning(f'[{rjcode}] -> {task}失败[HTTPError]：{err.response.status_code} {err.response.reason}\n')
+        elif isinstance(err, RequestException):
+            # requests 引发的其它异常
+            Renamer.logger.error(f'[{rjcode}] -> {task}失败[RequestException]：{str(err)}\n')
+
     def rename(self, root_path: str):
         work_folders = self.__scaner.scan(root_path)
         for rjcode, folder_path in work_folders:
             Renamer.logger.info(f'[{rjcode}] -> 发现 RJ 文件夹："{os.path.normpath(folder_path)}"')
             dirname, basename = os.path.split(folder_path)
+
+            # 爬取元数据
             try:
                 metadata = self.__scraper.scrape_metadata(rjcode)
-            except Timeout:
-                # 请求超时
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败：dlsite.com 请求超时！\n')
-                continue
-            except ConnectionError as err:
-                # 遇到其它网络问题（如：DNS 查询失败、拒绝连接等）
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败：{str(err)}\n')
-                continue
-            except HTTPError as err:
-                # HTTP 请求返回了不成功的状态码
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败：{err.response.status_code} {err.response.reason}\n')
-                continue
             except RequestException as err:
-                # requests 引发的其它异常
-                Renamer.logger.error(f'[{rjcode}] -> 重命名失败：{str(err)}\n')
+                Renamer.__handle_request_exception(rjcode, '爬取元数据', err)  # 爬取元数据失败
                 continue
+
+            # 修改封面
             if self.__make_folder_icon:
-                Renamer.changeIcon(self, rjcode, root_path) # 修改封面
+                try:
+                    icon_name = Renamer.changeIcon(self, rjcode, folder_path)  # 修改封面
+                    Renamer.logger.info(f'[{rjcode}] -> 修改封面成功："{icon_name}"')
+                except RequestException as err:
+                    Renamer.__handle_request_exception(rjcode, '下载封面图', err)  # 下载封面图失败
+                    continue
+                except OSError as err:
+                    Renamer.logger.error(f'[{rjcode}] -> 修改封面失败[OSError]：{str(err)}\n')
+                    continue
+
+            # 重命名文件夹
             new_basename = self.__compile_new_name(metadata)
             new_folder_path = os.path.join(dirname, new_basename)
             try:
@@ -154,9 +170,9 @@ class Renamer(object):
             except FileExistsError as err:
                 filename = os.path.normpath(err.filename)
                 filename2 = os.path.normpath(err.filename2)
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败：{err.strerror}："{filename}" -> "{filename2}"\n')
+                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败[FileExistsError]：{err.strerror}："{filename}" -> "{filename2}"\n')
             except OSError as err:
-                Renamer.logger.error(f'[{rjcode}] -> 重命名失败：{str(err)}\n')
+                Renamer.logger.error(f'[{rjcode}] -> 重命名失败[OSError]：{str(err)}\n')
 
     # 修改文件夹封面
     def changeIcon(self, rjcode: str, icon_dir: str):
@@ -182,3 +198,4 @@ class Renamer(object):
         os.system(cmd)
         if self.__remove_jpg_file:
             os.remove(jpg_path)
+        return icon_name
