@@ -1,8 +1,9 @@
 import re
 import os
+import contextlib
 import time
 from urllib.request import getproxies
-import urllib.request
+from typing import Union
 
 import requests
 from pyquery import PyQuery as pq
@@ -150,6 +151,19 @@ class Scraper(object):
         work_icon_url_ = str(d('#work_left > div > div > div.product-slider-data > div:nth-child(1)').attr('data-src'))
         work_icon_url = "https:" + work_icon_url_
         return work_icon_url
+
+    def urlretrieve(self, url: str,
+                    filename: Union[os.PathLike, str]) -> tuple[str, dict[str, str]]:
+        """"
+        https://gist.github.com/xflr6/f29ed682f23fd27b6a0b1241f244e6c9
+        """
+        with contextlib.closing(requests.get(url, stream=True, proxies=self.__proxies)) as r:
+            r.raise_for_status()
+            with open(filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8_192):
+                    f.write(chunk)
+
+        return filename, r.headers
 
     # 下载图片并生成.ico文件
     def scrape_icon(self, rjcode: str, icon_dir: str):

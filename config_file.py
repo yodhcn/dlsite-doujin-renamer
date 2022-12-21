@@ -114,7 +114,7 @@ class ConfigFile(object):
 
         # 检查 scraper_http_proxy
         http_proxy_pattern = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:(\d+)")
-        str_error_http_proxy = f'scraper_http_proxy 应是形如 "http://127.0.0.1:7890" 的 http 代理；或设为 null，这将使用系统代理'
+        str_error_http_proxy = f'scraper_http_proxy 应是形如 "127.0.0.1:7890" 的 http 代理；或设为 null，这将使用系统代理'
         if isinstance(scraper_http_proxy, str):
             if not http_proxy_pattern.fullmatch(scraper_http_proxy):
                 # 是字符串但不匹配正则规则
