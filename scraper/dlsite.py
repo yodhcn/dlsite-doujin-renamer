@@ -39,6 +39,10 @@ class Dlsite(object):
     def compile_work_page_url(rjcode: str):
         return f'https://www.dlsite.com/maniax/work/=/product_id/{rjcode}.html'
 
+    @staticmethod
+    def compile_product_api_url(rjcode: str):
+        return f'https://www.dlsite.com/maniax/api/=/product.json?workno={rjcode}'
+
     # 解析 scraper 链接中携带的参数 (dlsite.com 服务端使用 mod_rewrite 优化 SEO)
     @staticmethod
     def parse_url_params(url: str):

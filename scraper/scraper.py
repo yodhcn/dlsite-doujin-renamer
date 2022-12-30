@@ -52,6 +52,22 @@ class Scraper(object):
         time.sleep(self.__sleep_interval)
         return html
 
+    def __request_product_api(self, rjcode: str):
+        url = Dlsite.compile_product_api_url(rjcode)
+        params = {'locale': self.__locale.name}
+        response = requests.get(url,
+                                params,
+                                timeout=(self.__connect_timeout, self.__read_timeout),
+                                proxies=self.__proxies)
+        if len(response.json()) == 0:
+            response.status_code = 404
+            response.reason = 'Not Found'
+        response.raise_for_status()  # 如果返回了不成功的状态码，Response.raise_for_status() 会抛出一个 HTTPError 异常
+
+        product_info = response.json()[0]
+        time.sleep(self.__sleep_interval)
+        return product_info
+
     def __parse_metadata(self, html: str, rjcode: str):
         d = pq(html)
         metadata: WorkMetadata = {
@@ -142,8 +158,43 @@ class Scraper(object):
         rjcode = rjcode.upper()
         if not Dlsite.RJCODE_PATTERN.fullmatch(rjcode):
             raise ValueError
-        html = self.__request_work_page(rjcode)
-        metadata = self.__parse_metadata(html, rjcode)
+        # html = self.__request_work_page(rjcode)
+        # metadata = self.__parse_metadata(html, rjcode)
+        metadata = self.__scrape_metadata_from_product_api(rjcode)
+        return metadata
+
+    def __scrape_metadata_from_product_api(self, rjcode: str):
+        product_info = self.__request_product_api(rjcode)
+
+        metadata: WorkMetadata = {
+            'rjcode': product_info['workno'],
+            'work_name': product_info['work_name'],
+            'maker_id': product_info['maker_id'],
+            'maker_name': product_info['maker_name'],
+            'release_date': product_info['regist_date'][0:10],
+            'series_name': product_info['series_name'],
+            'series_id': product_info['series_id'],
+            'age_category': '',
+            'tags': [],
+            'cvs': [],
+            'cover_url': 'https:' + product_info['image_main']['url']
+        }
+
+        # tags
+        for genre in product_info['genres']:
+            metadata['tags'].append(genre['name'])
+        # cvs
+        for cv in product_info['creaters']['voice_by']:
+            metadata['cvs'].append(cv['name'])
+
+        # age_category
+        if product_info['age_category'] == 1:
+            metadata['age_category'] = 'GEN'
+        elif product_info['age_category'] == 2:
+            metadata['age_category'] = 'R15'
+        else:  # product_info['age_category'] == 3
+            metadata['age_category'] = 'ADL'
+
         return metadata
     
     # 获取封面图片链接
