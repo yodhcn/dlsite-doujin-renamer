@@ -15,7 +15,7 @@ from scraper import Locale, CachedScraper
 from my_frame import MyFrame
 from wx_log_handler import EVT_WX_LOG_EVENT, WxLogHandler
 
-VERSION = '0.2.3'
+VERSION = '0.2.4'
 
 
 class MyFileDropTarget(wx.FileDropTarget):
