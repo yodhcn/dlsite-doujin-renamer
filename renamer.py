@@ -2,6 +2,7 @@ import logging
 import os
 import re
 from pathlib import Path
+from datetime import datetime
 
 from requests.exceptions import RequestException, ConnectionError, HTTPError, Timeout
 
@@ -53,6 +54,8 @@ class Renamer(object):
             scaner: Scaner,
             scraper: Scraper,
             template: str = '[maker_name][rjcode] work_name cv_list_str',  # 模板
+            # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+            release_date_format: str = '%y%m%d',  # 日期格式
             delimiter: str = ' ',  # 列表转字符串的分隔符
             cv_list_left: str = ' ', # CV列表的左侧分隔符
             cv_list_right: str = ' ', # CV列表的右侧分隔符
@@ -67,6 +70,7 @@ class Renamer(object):
         self.__scaner = scaner
         self.__scraper = scraper
         self.__template = template
+        self.__release_date_format = release_date_format
         self.__delimiter = delimiter
         self.__cv_list_left = cv_list_left
         self.__cv_list_right = cv_list_right
@@ -89,7 +93,9 @@ class Renamer(object):
         new_name = new_name.replace('work_name', work_name)
         new_name = new_name.replace('maker_id', metadata['maker_id'])
         new_name = new_name.replace('maker_name', metadata['maker_name'])
-        new_name = new_name.replace('release_date', metadata['release_date'])
+        if 'release_date' in template:
+            release_date_obj = datetime.strptime(metadata['release_date'], '%Y-%m-%d').date()
+            new_name = new_name.replace('release_date', release_date_obj.strftime(self.__release_date_format))
 
         cv_list = metadata['cvs']  # cv列表
         cv_list_str = self.__cv_list_left + self.__delimiter.join(cv_list) + self.__cv_list_right if len(cv_list) > 0 else ''

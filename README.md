@@ -18,6 +18,7 @@
   "scraper_sleep_interval": 3,
   "scraper_http_proxy": null,
   "renamer_template": "[maker_name][rjcode] work_name cv_list_str",
+  "renamer_release_date_format": "%y%m%d",
   "renamer_exclude_square_brackets_in_work_name_flag": false,
   "renamer_illegal_character_to_full_width_flag": false,
   "renamer_delimiter": " ",
@@ -40,13 +41,14 @@
   - ```work_name``` 同人作品的名称
   - ```maker_id``` 同人作品的社团 RG 号
   - ```maker_name``` 同人作品的社团名称
-  - ```release_date``` 同人作品的发售日期
+  - ```release_date``` 同人作品的发售日期，具体的日期格式可在 ```renamer_release_date_format``` 中设置
   - ```cv_list_str``` 同人作品的声优列表
   - ```tags_list_str``` 同人作品的标签（分类）列表
 
   例如：```"renamer_template": "[maker_name] work_name (rjcode)[tags_list_str]"```<br/>
   重命名前：```RJ298293 蓄音レヱル 紅```<br/>
   重命名后：```[RaRo] 蓄音レヱル 紅 (RJ298293)[萌 感动 治愈 环绕音]```
+- ```renamer_release_date_format``` 命名器模板中 ```release_date``` 的日期格式
 - ```renamer_exclude_square_brackets_in_work_name_flag``` 命名器的 ```work_name``` 中是否排除 ```【】``` 及其间的内容。例如：
   - ```"renamer_exclude_square_brackets_in_work_name_flag": true```<br/>
     ```work_name = "道草屋 なつな2 隣の部屋のたぬきさん。"```

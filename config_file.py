@@ -14,6 +14,7 @@ class Config(TypedDict):
     scraper_sleep_interval: int
     scraper_http_proxy: Optional[str]
     renamer_template: str
+    renamer_release_date_format: str
     renamer_exclude_square_brackets_in_work_name_flag: bool
 
 
@@ -26,6 +27,8 @@ class ConfigFile(object):
         'scraper_sleep_interval': 3,
         'scraper_http_proxy': None,
         'renamer_template': '[maker_name][rjcode] work_name cv_list_str',
+        # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+        'renamer_release_date_format': '%y%m%d',
         'renamer_exclude_square_brackets_in_work_name_flag': False,
         'renamer_illegal_character_to_full_width_flag': False,
         'make_folder_icon': True,
@@ -73,6 +76,7 @@ class ConfigFile(object):
         scraper_http_proxy = config_dict.get('scraper_http_proxy', None)
         scraper_sleep_interval = config_dict.get('scraper_sleep_interval', None)
         renamer_template = config_dict.get('renamer_template', None)
+        renamer_release_date_format = config_dict.get('renamer_release_date_format', None)
         renamer_exclude_square_brackets_in_work_name_flag = \
             config_dict.get('renamer_exclude_square_brackets_in_work_name_flag', None)
         renamer_illegal_character_to_full_width_flag = \
@@ -126,6 +130,10 @@ class ConfigFile(object):
         # 检查 renamer_template
         if not isinstance(renamer_template, str) or 'rjcode' not in renamer_template:
             strerror_list.append('renamer_template 应是一个包含 "rjcode" 的字符串')
+
+        # 检查 renamer_release_date_format
+        if not isinstance(renamer_release_date_format, str):
+            strerror_list.append('renamer_release_date_format 应是一个字符串')
 
         # 检查 renamer_exclude_square_brackets_in_work_name_flag
         if not isinstance(renamer_exclude_square_brackets_in_work_name_flag, bool):

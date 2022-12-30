@@ -167,6 +167,7 @@ class AppFrame(MyFrame):
             scaner=scaner,
             scraper=cached_scraper,
             template=config['renamer_template'],
+            release_date_format=config['renamer_release_date_format'],
             delimiter=config['renamer_delimiter'],
             cv_list_left=config['cv_list_left'],
             cv_list_right=config['cv_list_right'],
