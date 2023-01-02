@@ -225,7 +225,7 @@ class Scraper(object):
         下载图片并生成.ico文件
         """
         icon_name = f'@folder-icon-{rjcode}.ico'
-        jpg_name = f'{rjcode}.jpg'
+        jpg_name = 'cover.jpg'
         icon_path = Path(os.path.join(icon_dir, icon_name))
         jpg_path = Path(os.path.join(icon_dir, jpg_name))
 
