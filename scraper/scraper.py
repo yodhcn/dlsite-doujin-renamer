@@ -184,8 +184,9 @@ class Scraper(object):
         for genre in product_info['genres']:
             metadata['tags'].append(genre['name'])
         # cvs
-        for cv in product_info['creaters']['voice_by']:
-            metadata['cvs'].append(cv['name'])
+        if isinstance(product_info['creaters'], dict):
+            for cv in product_info['creaters']['voice_by']:
+                metadata['cvs'].append(cv['name'])
 
         # age_category
         if product_info['age_category'] == 1:
