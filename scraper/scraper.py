@@ -76,8 +76,8 @@ class Scraper(object):
             'maker_id': '',
             'maker_name': '',
             'release_date': '',
-            'series_name': '',
-            'series_id': '',
+            'series_name': None,
+            'series_id': None,
             'age_category': '',
             'tags': [],
             'cvs': [],
@@ -184,7 +184,7 @@ class Scraper(object):
         for genre in product_info['genres']:
             metadata['tags'].append(genre['name'])
         # cvs
-        if isinstance(product_info['creaters'], dict):
+        if isinstance(product_info['creaters'], dict) and 'voice_by' in product_info['creaters']:
             for cv in product_info['creaters']['voice_by']:
                 metadata['cvs'].append(cv['name'])
 
