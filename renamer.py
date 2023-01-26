@@ -11,6 +11,7 @@ from scraper import WorkMetadata, Scraper
 
 import stat
 
+import win32api
 # Windows 系统的保留字符
 # https://docs.microsoft.com/zh-cn/windows/win32/fileio/naming-a-file
 # <（小于）
@@ -198,12 +199,14 @@ class Renamer(object):
                 inifile.close()
 
             # 隐藏 desktop.ini 文件 & .ico 文件
-            cmd1 = icon_dir[0:2]
-            cmd2 = "cd " + '\"' + icon_dir + '\"'
-            cmd3 = "attrib +h +s " + 'desktop.ini'
-            cmd4 = "attrib +h +s " + icon_name
-            cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
-            os.system(cmd)  # 运行 cmd
+            win32api.SetFileAttributes(str(ini_file_path), 38)
+            win32api.SetFileAttributes(os.path.join(icon_dir, icon_name), 38)
+            # cmd1 = icon_dir[0:2]
+            # cmd2 = "cd " + '\"' + icon_dir + '\"'
+            # cmd3 = "attrib +h +s " + 'desktop.ini'
+            # cmd4 = "attrib +h +s " + icon_name
+            # cmd = cmd1 + " & " + cmd2 + " & " + cmd3 + " & " + cmd4
+            # os.system(cmd)  # 运行 cmd
             Renamer.logger.info(f'[{rjcode}] -> 修改封面成功："{icon_name}"')
 
         if self.__remove_jpg_file:
