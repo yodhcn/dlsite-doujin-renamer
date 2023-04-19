@@ -21,14 +21,15 @@ def _load_translations():
 
 class Dlsite(object):
     TRANSLATIONS: Final = _load_translations()
+    WORKNO_PATTERN: Final = re.compile(r'[RBV]J(\d{6}|\d{8})(?!\d+)')
     RJCODE_PATTERN: Final = re.compile(r'RJ(\d{6}|\d{8})(?!\d+)')
     RGCODE_PATTERN: Final = re.compile(r'RG(\d{5})(?!\d+)')
     SRICODE_PATTERN: Final = re.compile(r'SRI(\d{10})(?!\d+)')
 
-    # 提取字符串中的 rjcode
+    # 提取字符串中的 workno
     @staticmethod
-    def parse_rjcode(string: str):
-        match = Dlsite.RJCODE_PATTERN.search(string.upper())
+    def parse_workno(string: str):
+        match = Dlsite.WORKNO_PATTERN.search(string.upper())
         if match:
             return match.group()
         else:

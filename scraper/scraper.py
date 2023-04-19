@@ -156,15 +156,15 @@ class Scraper(object):
 
     def scrape_metadata(self, rjcode: str):
         rjcode = rjcode.upper()
-        if not Dlsite.RJCODE_PATTERN.fullmatch(rjcode):
+        if not Dlsite.WORKNO_PATTERN.fullmatch(rjcode):
             raise ValueError
         # html = self.__request_work_page(rjcode)
         # metadata = self.__parse_metadata(html, rjcode)
         metadata = self.__scrape_metadata_from_product_api(rjcode)
         return metadata
 
-    def __scrape_metadata_from_product_api(self, rjcode: str):
-        product_info = self.__request_product_api(rjcode)
+    def __scrape_metadata_from_product_api(self, workno: str):
+        product_info = self.__request_product_api(workno)
 
         metadata: WorkMetadata = {
             'rjcode': product_info['workno'],

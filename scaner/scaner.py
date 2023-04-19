@@ -13,7 +13,7 @@ class Scaner(object):
         """
         if os.path.isdir(root_path):  # 检查是否是文件夹
             folder = os.path.basename(root_path)
-            rjcode = Dlsite.parse_rjcode(folder)
+            rjcode = Dlsite.parse_workno(folder)
             if rjcode:  # 检查文件夹名称中是否含RJ号
                 yield rjcode, root_path
             elif _depth < self.__max_depth:
