@@ -78,3 +78,12 @@
   - 文件名中的标签：`标签1,替换2,标签3,标签6`
 
 【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 ```config.json``` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
+
+## 开发者文档
+### 环境
+1. install python 3.9
+2. ```pip install -r requirements.txt```
+### 运行
+```python main.py```
+### 打包（输出路径 `dist/main.exe`）
+```python build.py```
