@@ -179,7 +179,11 @@ class AppFrame(MyFrame):
 
         # 执行重命名
         for root_path in root_path_list:
-            renamer.rename(root_path)
+            try:
+                renamer.rename(root_path)
+            except Exception as err:
+                Renamer.logger.error(f'[Unexpected exception] {str(err)}\n')
+                break
 
         self.__before_worker_thread_end()
 
