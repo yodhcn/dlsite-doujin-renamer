@@ -6,6 +6,7 @@
 - 支持手动选择文件夹或拖拽文件夹到软件窗口
 - 支持在 ```config.json``` 中设置软件配置
 - 支持在 ```cache.db``` 中缓存从 [dlsite.com](https://www.dlsite.com/maniax/) 抓取的元数据
+- 内置默认命名模板`[maker_name][rjcode] work_name cv_list_str`，开箱即用
 
 ## Config
 示例配置
@@ -78,6 +79,11 @@
   - 文件名中的标签：`标签1,替换2,标签3,标签6`
 
 【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 ```config.json``` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
+
+## 支持
+项目于 2019 年到至今一直坚持维护和开源，经过 N 次的迭代与优化，如果项目能帮到你，我很开心。\
+贫穷开发者在线赛博乞讨，您可以请作者一杯咖啡，也可以来条 SC 留言。
+![赛博乞讨](赞助_zfb_wx.jpg)
 
 ## 开发者文档
 ### 环境
