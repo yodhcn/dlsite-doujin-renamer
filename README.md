@@ -87,3 +87,6 @@
 ```python main.py```
 ### 打包（输出路径 `dist/main.exe`）
 ```python build.py```
+
+## Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=yodhcn/dlsite-doujin-renamer&type=Date)](https://www.star-history.com/#yodhcn/dlsite-doujin-renamer&Date)
