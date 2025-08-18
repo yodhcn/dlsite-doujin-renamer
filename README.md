@@ -8,26 +8,39 @@
 - 支持在 ```cache.db``` 中缓存从 [dlsite.com](https://www.dlsite.com/maniax/) 抓取的元数据
 
 ## Config
-示例配置
+默认配置
 ```json
 {
   "scaner_max_depth": 5,
-  "scraper_locale": "zh_cn",
+  "scraper_locale": "ja_jp",
   "scraper_connect_timeout": 10,
   "scraper_read_timeout": 10,
   "scraper_sleep_interval": 3,
   "scraper_http_proxy": null,
-  "renamer_template": "[maker_name][rjcode] work_name cv_list_str",
+  "renamer_template": "age_cat[maker_name][rjcode] work_name cv_list_str",
   "renamer_release_date_format": "%y%m%d",
-  "renamer_exclude_square_brackets_in_work_name_flag": false,
+  "renamer_exclude_square_brackets_in_work_name_flag": true,
   "renamer_illegal_character_to_full_width_flag": false,
+  "renamer_make_folder_icon": true,
+  "renamer_remove_jpg_file": true,
   "renamer_delimiter": " ",
+  "renamer_cv_list_left": "(CV ",
+  "renamer_cv_list_right": ")",
   "renamer_tags_max_number": 5,
   "renamer_tags_ordered_list": [
     "标签1",
-    ["标签2","替换2"],
+    [
+      "标签2",
+      "替换2"
+    ],
     "标签3"
-  ]
+  ],
+  "renamer_age_cat_map_gen": "全年龄",
+  "renamer_age_cat_map_r15": "R15",
+  "renamer_age_cat_map_r18": "R18",
+  "renamer_age_cat_left": "(",
+  "renamer_age_cat_right": ")",
+  "renamer_age_cat_ignore_r18": false
 }
 ```
 - ```scaner_max_depth``` 扫描器的扫描深度
@@ -44,6 +57,7 @@
   - ```release_date``` 同人作品的发售日期，具体的日期格式可在 ```renamer_release_date_format``` 中设置
   - ```cv_list_str``` 同人作品的声优列表
   - ```tags_list_str``` 同人作品的标签（分类）列表
+  - ```age_cat``` 同人作品的年龄分级（全年龄、R15、R18）
 
   例如：```"renamer_template": "[maker_name] work_name (rjcode)[tags_list_str]"```<br/>
   重命名前：```RJ298293 蓄音レヱル 紅```<br/>
@@ -76,6 +90,15 @@
     ```
   - 作品含有的标签：`标签6` `标签5` `标签4` `标签3` `标签2` `标签1`
   - 文件名中的标签：`标签1,替换2,标签3,标签6`
+- ```renamer_age_cat_map_gen``` 自定义`全年龄`作品的年龄分级
+- ```renamer_age_cat_map_r15``` 自定义`R15`作品的年龄分级
+- ```renamer_age_cat_map_r18``` 自定义`R18`作品的年龄分级
+- ```renamer_age_cat_left``` ```renamer_age_cat_right``` 自定义命名器在 `age_cat`(年龄分级) 左右两侧的符号
+- ``renamer_age_cat_ignore_r18`` 命名器是否忽略 R18 作品的 `age_cat` (年龄分级)，R18 作品占大多数时建议开启。例如：```"renamer_template": "age_cat[maker_name] work_name (rjcode)"```
+    - ```"renamer_age_cat_ignore_r18": true```<br/>
+      ```work_name = "[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"```
+    - ```"renamer_age_cat_ignore_r18": false```<br/>
+      ```work_name = "(R18)[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"```
 
 【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 ```config.json``` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
 

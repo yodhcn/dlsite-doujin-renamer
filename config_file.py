@@ -49,7 +49,7 @@ DEFAULT_CONFIG: Config = {
     # scaner
     'scaner_max_depth': 5,
     # scraper
-    'scraper_locale': 'zh_cn',
+    'scraper_locale': 'ja_jp',
     'scraper_connect_timeout': 10,
     'scraper_read_timeout': 10,
     'scraper_sleep_interval': 3,
@@ -57,7 +57,7 @@ DEFAULT_CONFIG: Config = {
     # renamer
     'renamer_template': 'age_cat[maker_name][rjcode] work_name cv_list_str',
     'renamer_release_date_format': '%y%m%d',
-    'renamer_exclude_square_brackets_in_work_name_flag': False,
+    'renamer_exclude_square_brackets_in_work_name_flag': True,
     'renamer_illegal_character_to_full_width_flag': False,
     'renamer_make_folder_icon': True,
     'renamer_remove_jpg_file': True,
