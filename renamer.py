@@ -107,6 +107,17 @@ class Renamer(object):
         new_name = new_name.replace('work_name', work_name)
         new_name = new_name.replace('maker_id', metadata['maker_id'])
         new_name = new_name.replace('maker_name', metadata['maker_name'])
+        if 'age_cat' in template:
+            if self.age_cat_ignore_r18 and metadata['age_category'] == 'R18':
+                new_name = new_name.replace('age_cat', "")
+            else:
+                if metadata['age_category'] == 'GEN':
+                    age_cat = self.age_cat_map_gen
+                elif metadata['age_category'] == 'R15':
+                    age_cat = self.age_cat_map_r15
+                else:
+                    age_cat = self.age_cat_map_r18
+                new_name = new_name.replace('age_cat', self.age_cat_left + age_cat + self.age_cat_right)
         if 'release_date' in template:
             release_date_obj = datetime.strptime(metadata['release_date'], '%Y-%m-%d').date()
             new_name = new_name.replace('release_date', release_date_obj.strftime(self.__release_date_format))
