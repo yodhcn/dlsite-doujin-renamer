@@ -113,7 +113,7 @@ class AppFrame(MyFrame):
         self.__before_worker_thread_start()
 
         try:
-            config = self.__config_file.load_config()  # 从配置文件中读取配置
+            self.__config_file.load_config_dict()  # 从配置文件中读取配置
         except JSONDecodeError as err:
             self.__print_error(f'配置文件解析失败："{os.path.normpath(self.__config_file.file_path)}"')
             self.__print_error(f'JSONDecodeError: {str(err)}')
@@ -126,17 +126,18 @@ class AppFrame(MyFrame):
             return
 
         # 检查配置是否合法
-        strerror_list = ConfigFile.verify_config(config)
+        strerror_list = self.__config_file.verify_config()
         if len(strerror_list) > 0:
-            self.__print_error(f'配置文件验证失败："{os.path.normpath(self.__config_file.file_path)}"')
-            for strerror in strerror_list:
-                self.__print_error(strerror)
+            self.__print_error(f'配置文件验证失败："{os.path.normpath(self.__config_file.file_path)}"'
+                               + "\n"
+                               + "\n\n".join(strerror_list))
             self.__before_worker_thread_end()
             return
 
+        config = self.__config_file.config
+
         # 配置 scaner
-        scaner_max_depth = config['scaner_max_depth']
-        scaner = Scaner(max_depth=scaner_max_depth)
+        scaner = Scaner(max_depth=config['scaner_max_depth'])
 
         # 配置 scraper
         scraper_locale = config['scraper_locale']
@@ -169,12 +170,12 @@ class AppFrame(MyFrame):
             template=config['renamer_template'],
             release_date_format=config['renamer_release_date_format'],
             delimiter=config['renamer_delimiter'],
-            cv_list_left=config['cv_list_left'],
-            cv_list_right=config['cv_list_right'],
+            cv_list_left=config['renamer_cv_list_left'],
+            cv_list_right=config['renamer_cv_list_right'],
             exclude_square_brackets_in_work_name_flag=config['renamer_exclude_square_brackets_in_work_name_flag'],
             renamer_illegal_character_to_full_width_flag=config['renamer_illegal_character_to_full_width_flag'],
-            make_folder_icon=config['make_folder_icon'],
-            remove_jpg_file=config['remove_jpg_file'],
+            make_folder_icon=config['renamer_make_folder_icon'],
+            remove_jpg_file=config['renamer_remove_jpg_file'],
             tags_option=tags_option)
 
         # 执行重命名
