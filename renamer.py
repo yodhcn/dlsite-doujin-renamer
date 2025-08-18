@@ -54,17 +54,24 @@ class Renamer(object):
             self,
             scaner: Scaner,
             scraper: Scraper,
-            template: str = '[maker_name][rjcode] work_name cv_list_str',  # 模板
+            template: str,  # 模板
             # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
-            release_date_format: str = '%y%m%d',  # 日期格式
-            delimiter: str = ' ',  # 列表转字符串的分隔符
-            cv_list_left: str = ' ', # CV列表的左侧分隔符
-            cv_list_right: str = ' ', # CV列表的右侧分隔符
-            exclude_square_brackets_in_work_name_flag: bool = False,  # 设为 True 时，移除 work_name 中【】及其间的内容
-            renamer_illegal_character_to_full_width_flag: bool = False,  # 设为 True 时，新文件名将非法字符转为全角；为 False 时直接移除.
-            make_folder_icon: bool = True, # 设为 True 时，将会下载作品封面并将其设为文件夹封面
-            remove_jpg_file: bool = True, # 设为 True 时，将会保留下载的作品封面
-            tags_option: dict = None,  # 标签相关设置
+            release_date_format: str,  # 日期格式
+            delimiter,  # 列表转字符串的分隔符
+            cv_list_left, # CV列表的左侧分隔符
+            cv_list_right, # CV列表的右侧分隔符
+            exclude_square_brackets_in_work_name_flag,  # 设为 True 时，移除 work_name 中【】及其间的内容
+            renamer_illegal_character_to_full_width_flag,  # 设为 True 时，新文件名将非法字符转为全角；为 False 时直接移除.
+            make_folder_icon, # 设为 True 时，将会下载作品封面并将其设为文件夹封面
+            remove_jpg_file, # 设为 True 时，将会保留下载的作品封面
+            tags_option,  # 标签相关设置
+            # 年龄分级相关配置
+            age_cat_map_gen: str,
+            age_cat_map_r15: str,
+            age_cat_map_r18: str,
+            age_cat_left: str,
+            age_cat_right: str,
+            age_cat_ignore_r18: bool,
     ):
         if 'rjcode' not in template:
             raise ValueError  # 重命名不能丢失 rjcode
@@ -80,6 +87,12 @@ class Renamer(object):
         self.__make_folder_icon = make_folder_icon
         self.__remove_jpg_file = remove_jpg_file
         self.__tags_option = tags_option
+        self.age_cat_map_gen = age_cat_map_gen
+        self.age_cat_map_r15 = age_cat_map_r15
+        self.age_cat_map_r18 = age_cat_map_r18
+        self.age_cat_left = age_cat_left
+        self.age_cat_right = age_cat_right
+        self.age_cat_ignore_r18 = age_cat_ignore_r18
 
     def __compile_new_name(self, metadata: WorkMetadata):
         """

@@ -8,7 +8,7 @@ from typing import Optional, Callable
 
 import wx
 
-from config_file import ConfigFile
+from config_file import ConfigFile, Config
 from renamer import Renamer
 from scaner import Scaner
 from scraper import Locale, CachedScraper
@@ -134,7 +134,7 @@ class AppFrame(MyFrame):
             self.__before_worker_thread_end()
             return
 
-        config = self.__config_file.config
+        config: Config = self.__config_file.config
 
         # 配置 scaner
         scaner = Scaner(max_depth=config['scaner_max_depth'])
@@ -176,7 +176,14 @@ class AppFrame(MyFrame):
             renamer_illegal_character_to_full_width_flag=config['renamer_illegal_character_to_full_width_flag'],
             make_folder_icon=config['renamer_make_folder_icon'],
             remove_jpg_file=config['renamer_remove_jpg_file'],
-            tags_option=tags_option)
+            tags_option=tags_option,
+            age_cat_map_gen=config['renamer_age_cat_map_gen'],
+            age_cat_map_r15=config['renamer_age_cat_map_r15'],
+            age_cat_map_r18=config['renamer_age_cat_map_r18'],
+            age_cat_left=config['renamer_age_cat_left'],
+            age_cat_right=config['renamer_age_cat_right'],
+            age_cat_ignore_r18=config['renamer_age_cat_ignore_r18'],
+        )
 
         # 执行重命名
         for root_path in root_path_list:

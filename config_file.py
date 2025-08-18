@@ -34,9 +34,9 @@ class Config(TypedDict):
     renamer_cv_list_right: FilenameStr
     renamer_tags_max_number: int  # 标签个数上限
     renamer_tags_ordered_list: list[Union[str, list[str]]]
-    renamer_age_cat_map_0: str
-    renamer_age_cat_map_1: str
-    renamer_age_cat_map_2: str
+    renamer_age_cat_map_gen: str
+    renamer_age_cat_map_r15: str
+    renamer_age_cat_map_r18: str
     renamer_age_cat_left: FilenameStr
     renamer_age_cat_right: FilenameStr
     renamer_age_cat_ignore_r18: bool
@@ -55,7 +55,7 @@ DEFAULT_CONFIG: Config = {
     'scraper_sleep_interval': 3,
     'scraper_http_proxy': None,
     # renamer
-    'renamer_template': '[maker_name][rjcode] work_name cv_list_str',
+    'renamer_template': 'age_cat[maker_name][rjcode] work_name cv_list_str',
     'renamer_release_date_format': '%y%m%d',
     'renamer_exclude_square_brackets_in_work_name_flag': False,
     'renamer_illegal_character_to_full_width_flag': False,
@@ -66,11 +66,11 @@ DEFAULT_CONFIG: Config = {
     'renamer_cv_list_right': ")",
     'renamer_tags_max_number': 5,
     'renamer_tags_ordered_list': ["标签1", ["标签2", "替换2"], "标签3"],  # 标签顺序列表，每一项可为字符串或[原标签,替换名]
-    'renamer_age_cat_map_0': "全年龄",
-    'renamer_age_cat_map_1': "R15",
-    'renamer_age_cat_map_2': "R18",
-    'renamer_age_cat_left': "[",
-    'renamer_age_cat_right': "]",
+    'renamer_age_cat_map_gen': "全年龄",
+    'renamer_age_cat_map_r15': "R15",
+    'renamer_age_cat_map_r18': "R18",
+    'renamer_age_cat_left': "(",
+    'renamer_age_cat_right': ")",
     'renamer_age_cat_ignore_r18': True
 }
 

@@ -105,7 +105,7 @@ class Scraper(object):
         elif product_info['age_category'] == 2:
             metadata['age_category'] = 'R15'
         else:  # product_info['age_category'] == 3
-            metadata['age_category'] = 'ADL'
+            metadata['age_category'] = 'R18'
 
         return metadata
     
