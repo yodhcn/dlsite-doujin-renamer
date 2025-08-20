@@ -29,10 +29,7 @@
   "renamer_tags_max_number": 5,
   "renamer_tags_ordered_list": [
     "标签1",
-    [
-      "标签2",
-      "替换2"
-    ],
+    ["标签2", "替换2"],
     "标签3"
   ],
   "renamer_age_cat_map_gen": "全年龄",
@@ -81,11 +78,11 @@
     `文/件*名` → `文件名`
 - `make_folder_icon` 是否将文件夹封面改为作品封面，`true` 为修改，`false` 反之
 - `remove_jpg_file` 是否保留文件夹中的作品封面图，`true` 为移除，`false` 为保留（不会消除文件夹封面）
-- `renamer_delimiter` 命名器将列表转为字符串时的分隔符，作用于 `cv_list_str` 和 `tags_list_str`
-- `cv_list_left` `cv_list_right` 命名器在声优列表左右外括的符号，作用于 `cv_list_str`
+- `renamer_delimiter` 命名器将列表转为字符串时的分隔符，作用于 `cv_list_str` 和 `tags_list_str`。不能含有系统保留字 `[^\/:*?`<>|]*`
+- `cv_list_left` `cv_list_right` 命名器在声优列表左右外括的符号，作用于 `cv_list_str`。不能含有系统保留字 `[^\/:*?`<>|]*`
 - `renamer_tags_max_number` 命名器向文件名中写入标签的最大个数
 - `renamer_tags_ordered_list` 命名器向文件名中写入标签的优先顺序和替换标签。列表。每一项若是字符串，则为匹配的标签。若是二元列表，则为`["匹配的标签","替换的标签"]`。例如：
-  - `
+  - ```
     "renamer_delimiter": ",",
     "renamer_tags_max_number": 4,
     "renamer_tags_ordered_list": [
@@ -93,19 +90,19 @@
         ["标签2","替换2"],
         "标签3"
     ]
-    `
+    ```
   - 作品含有的标签：`标签6` `标签5` `标签4` `标签3` `标签2` `标签1`
   - 文件名中的标签：`标签1,替换2,标签3,标签6`
 - `renamer_age_cat_map_gen` 自定义`全年龄`作品的年龄分级
 - `renamer_age_cat_map_r15` 自定义`R15`作品的年龄分级
 - `renamer_age_cat_map_r18` 自定义`R18`作品的年龄分级
-- `renamer_age_cat_left` `renamer_age_cat_right` 自定义命名器在 `age_cat`(年龄分级) 左右两侧的符号
+- `renamer_age_cat_left` `renamer_age_cat_right` 自定义命名器在 `age_cat`(年龄分级) 左右两侧的符号。不能含有系统保留字 `[^\/:*?`<>|]*`
 - ``renamer_age_cat_ignore_r18`` 命名器是否忽略 R18 作品的 `age_cat` (年龄分级)，R18 作品占大多数时建议开启。例如：`"renamer_template": "age_cat[maker_name] work_name (rjcode)"`
   - `"renamer_age_cat_ignore_r18": true`<br/>
       `work_name = "[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
   - `"renamer_age_cat_ignore_r18": false`<br/>
       `work_name = "(R18)[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
-- `renamer_series_name_left` `renamer_series_name_right` 自定义命名器在 `series_name`(系列名) 左右两侧的符号
+- `renamer_series_name_left` `renamer_series_name_right` 自定义命名器在 `series_name`(系列名) 左右两侧的符号。不能含有系统保留字 `[^\/:*?`<>|]*`
 - `renamer_mode` 命名器的工作模式
   - `RENAME` 重命名，使用模板 `renamer_template`
   - `MOVE` 移动到指定根目录，使用模板 `renamer_move_template`

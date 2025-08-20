@@ -3,9 +3,8 @@ import os
 import re
 from typing import Annotated, Optional, Union, Literal
 from pydantic import Field
-from jsonschema import Draft202012Validator
 from typing_extensions import TypedDict
-from pydantic import TypeAdapter, ConfigDict
+from pydantic import TypeAdapter, ConfigDict, ValidationError
 from scraper import Locale
 
 FilenameStr = Annotated[str, Field(pattern=r'^[^\/:*?"<>|]*$', description="""不能含有系统保留字[^\/:*?`<>|]*""")]
@@ -120,21 +119,39 @@ class ConfigFile(object):
         """
         验证配置是否合理
         """
-        schema = ta.json_schema()
-        validator = Draft202012Validator(schema)
-        strerror_list: list[str] = []
+        # schema = ta.json_schema()
+        # validator = Draft202012Validator(schema)
+        # strerror_list: list[str] = []
+        #
+        # for i, error in enumerate(validator.iter_errors(self.__config_dict), 1):
+        #     description = error.schema.get('description', None)
+        #     if description:
+        #         strerror_list.append(
+        #             "\n".join(["- 错误: " + error.message,
+        #                        "  校验器: " + error.validator,
+        #                        "  描述:" + description]))
+        #     else:
+        #         strerror_list.append(
+        #             "\n".join(["- 错误: " + error.message,
+        #                        "  校验器: " + error.validator]))
+        # if len(strerror_list) == 0:
+        #     self.__config = Config(**self.__config_dict)
 
-        for i, error in enumerate(validator.iter_errors(self.__config_dict), 1):
-            description = error.schema.get('description', None)
-            if description:
+        strerror_list: list[str] = []
+        try:
+            validated = ta.validate_python(self.__config_dict)
+            self.__config = validated
+        except ValidationError as e:
+            for err in e.errors():
+                loc = ".".join(map(str, err["loc"]))
                 strerror_list.append(
-                    "\n".join(["- 错误: " + error.message,
-                               "  校验器: " + error.validator,
-                               "  描述:" + description]))
-            else:
-                strerror_list.append(
-                    "\n".join(["- 错误: " + error.message,
-                               "  校验器: " + error.validator]))
+                    "\n".join([
+                        f"- 错误: {err['msg']}",
+                        f"  校验器: {err['type']}",
+                        f"  字段: {loc}",
+                    ])
+                )
+
         if len(strerror_list) == 0:
             self.__config = Config(**self.__config_dict)
 
