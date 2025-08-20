@@ -15,7 +15,7 @@ from scraper import Locale, CachedScraper
 from my_frame import MyFrame
 from wx_log_handler import EVT_WX_LOG_EVENT, WxLogHandler
 
-VERSION = '0.2.9'
+VERSION = '0.3.0'
 
 
 class MyFileDropTarget(wx.FileDropTarget):
@@ -53,6 +53,8 @@ class AppFrame(MyFrame):
         wx_log_handler.setLevel(logging.INFO)
         wx_log_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
         Renamer.logger.addHandler(wx_log_handler)
+
+        self.text_ctrl.AppendText('源代码 ' + 'https://github.com/yodhcn/dlsite-doujin-renamer' + '\n')
 
     def thread_it(self, func: Callable, *args):
         """
