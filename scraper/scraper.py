@@ -77,14 +77,18 @@ class Scraper(object):
     def __scrape_metadata_from_product_api(self, workno: str):
         product_info = self.__request_product_api(workno)
 
+        translation_info = product_info.get('translation_info', None)
+        original_workno = translation_info.get('original_workno', None) if translation_info else None
+        original_product_info = self.__request_product_api(original_workno) if original_workno else None
+
         metadata: WorkMetadata = {
             'rjcode': product_info['workno'],
             'work_name': product_info['work_name'],
-            'maker_id': product_info['maker_id'],
-            'maker_name': product_info['maker_name'],
+            'maker_id': original_product_info['maker_id'] if original_product_info else product_info['maker_id'],
+            'maker_name': original_product_info['maker_name'] if original_product_info else product_info['maker_name'],
             'release_date': product_info['regist_date'][0:10],
-            'series_name': product_info['series_name'],
-            'series_id': product_info['series_id'],
+            'series_name': original_product_info['series_name'] if original_product_info else product_info['series_name'],
+            'series_id': original_product_info['series_id'] if original_product_info else product_info['series_id'],
             'age_category': '',
             'tags': [],
             'cvs': [],
