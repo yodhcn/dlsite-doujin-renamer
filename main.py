@@ -185,7 +185,9 @@ class AppFrame(MyFrame):
             age_cat_ignore_r18=config['renamer_age_cat_ignore_r18'],
             mode=config['renamer_mode'],
             move_root=config['renamer_move_root'],
-            move_template=config['renamer_move_template']
+            move_template=config['renamer_move_template'],
+            series_name_left=config['renamer_series_name_left'],
+            series_name_right=config['renamer_series_name_right']
         )
 
         # 执行重命名

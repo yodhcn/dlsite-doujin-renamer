@@ -40,6 +40,8 @@ class Config(TypedDict):
     renamer_age_cat_left: FilenameStr
     renamer_age_cat_right: FilenameStr
     renamer_age_cat_ignore_r18: bool
+    renamer_series_name_left: FilenameStr
+    renamer_series_name_right: FilenameStr
     renamer_mode: Literal["RENAME", "MOVE", "LINK"]
     renamer_move_root: str
     renamer_move_template: RjcodeStr
@@ -75,9 +77,11 @@ DEFAULT_CONFIG: Config = {
     'renamer_age_cat_left': "(",
     'renamer_age_cat_right': ")",
     'renamer_age_cat_ignore_r18': True,
+    'renamer_series_name_left': "",
+    'renamer_series_name_right': "",
     'renamer_mode': 'RENAME',
     'renamer_move_root': 'RENAMER_MOVE_ROOT',
-    'renamer_move_template': 'maker_name/age_cat[rjcode] work_name cv_list_str'
+    'renamer_move_template': 'maker_name/series_name/age_cat[rjcode] work_name cv_list_str'
 }
 
 

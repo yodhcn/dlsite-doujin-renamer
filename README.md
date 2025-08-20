@@ -41,9 +41,11 @@
   "renamer_age_cat_left": "(",
   "renamer_age_cat_right": ")",
   "renamer_age_cat_ignore_r18": true,
+  "renamer_series_name_left": "",
+  "renamer_series_name_right": "",
   "renamer_mode": "RENAME",
   "renamer_move_root": "RENAMER_MOVE_ROOT",
-  "renamer_move_template": "maker_name/age_cat[rjcode] work_name cv_list_str"
+  "renamer_move_template": "maker_name/series_name/age_cat[rjcode] work_name cv_list_str"
 }
 ```
 - `scaner_max_depth` 扫描器的扫描深度
@@ -57,6 +59,7 @@
   - `work_name` 同人作品的名称
   - `maker_id` 同人作品的社团 RG 号
   - `maker_name` 同人作品的社团名称
+  - `series_name` 系列名。由于作品可能不存在系列名，请配合 `renamer_series_name_left` `renamer_series_name_right` 使用
   - `release_date` 同人作品的发售日期，具体的日期格式可在 `renamer_release_date_format` 中设置
   - `cv_list_str` 同人作品的声优列表
   - `tags_list_str` 同人作品的标签（分类）列表
@@ -102,6 +105,7 @@
       `work_name = "[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
   - `"renamer_age_cat_ignore_r18": false`<br/>
       `work_name = "(R18)[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
+- `renamer_series_name_left` `renamer_series_name_right` 自定义命名器在 `series_name`(系列名) 左右两侧的符号
 - `renamer_mode` 命名器的工作模式
   - `RENAME` 重命名，使用模板 `renamer_template`
   - `MOVE` 移动到指定根目录，使用模板 `renamer_move_template`

@@ -76,6 +76,8 @@ class Renamer(object):
             age_cat_left: str,
             age_cat_right: str,
             age_cat_ignore_r18: bool,
+            series_name_left: str,
+            series_name_right: str,
             mode: str,  # RENAME/MOVE/LINK
             move_root: str,
             move_template: str
@@ -100,6 +102,8 @@ class Renamer(object):
         self.__age_cat_left = age_cat_left
         self.__age_cat_right = age_cat_right
         self.__age_cat_ignore_r18 = age_cat_ignore_r18
+        self.__series_name_left = series_name_left
+        self.__series_name_right = series_name_right
         self.__mode = mode
         self.__move_root = move_root
         self.__move_template = move_template
@@ -128,6 +132,11 @@ class Renamer(object):
                 else:
                     age_cat = self.__age_cat_map_r18
                 new_name = new_name.replace('age_cat', self.__age_cat_left + age_cat + self.__age_cat_right)
+        if 'series_name' in template:
+            if metadata['series_name']:
+                new_name = new_name.replace('series_name', self.__series_name_left + metadata['series_name'] + self.__series_name_right)
+            else:
+                new_name = new_name.replace('series_name', '')
         if 'release_date' in template:
             release_date_obj = datetime.strptime(metadata['release_date'], '%Y-%m-%d').date()
             new_name = new_name.replace('release_date', release_date_obj.strftime(self.__release_date_format))
