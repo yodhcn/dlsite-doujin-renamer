@@ -94,15 +94,15 @@ class Renamer(object):
         self.__make_folder_icon = make_folder_icon
         self.__remove_jpg_file = remove_jpg_file
         self.__tags_option = tags_option
-        self.age_cat_map_gen = age_cat_map_gen
-        self.age_cat_map_r15 = age_cat_map_r15
-        self.age_cat_map_r18 = age_cat_map_r18
-        self.age_cat_left = age_cat_left
-        self.age_cat_right = age_cat_right
-        self.age_cat_ignore_r18 = age_cat_ignore_r18
-        self.mode = mode
-        self.move_root = move_root
-        self.move_template = move_template
+        self.__age_cat_map_gen = age_cat_map_gen
+        self.__age_cat_map_r15 = age_cat_map_r15
+        self.__age_cat_map_r18 = age_cat_map_r18
+        self.__age_cat_left = age_cat_left
+        self.__age_cat_right = age_cat_right
+        self.__age_cat_ignore_r18 = age_cat_ignore_r18
+        self.__mode = mode
+        self.__move_root = move_root
+        self.__move_template = move_template
 
     def __compile_new_name(self, metadata: WorkMetadata):
         """
@@ -112,22 +112,22 @@ class Renamer(object):
             if self.__exclude_square_brackets_in_work_name_flag \
             else metadata['work_name']
 
-        template = self.__template if self.mode == 'RENAME' else self.move_template
+        template = self.__template if self.__mode == 'RENAME' else self.__move_template
         new_name = template.replace('rjcode', metadata['rjcode'])
         new_name = new_name.replace('work_name', work_name)
         new_name = new_name.replace('maker_id', metadata['maker_id'])
         new_name = new_name.replace('maker_name', metadata['maker_name'])
         if 'age_cat' in template:
-            if self.age_cat_ignore_r18 and metadata['age_category'] == 'R18':
+            if self.__age_cat_ignore_r18 and metadata['age_category'] == 'R18':
                 new_name = new_name.replace('age_cat', "")
             else:
                 if metadata['age_category'] == 'GEN':
-                    age_cat = self.age_cat_map_gen
+                    age_cat = self.__age_cat_map_gen
                 elif metadata['age_category'] == 'R15':
-                    age_cat = self.age_cat_map_r15
+                    age_cat = self.__age_cat_map_r15
                 else:
-                    age_cat = self.age_cat_map_r18
-                new_name = new_name.replace('age_cat', self.age_cat_left + age_cat + self.age_cat_right)
+                    age_cat = self.__age_cat_map_r18
+                new_name = new_name.replace('age_cat', self.__age_cat_left + age_cat + self.__age_cat_right)
         if 'release_date' in template:
             release_date_obj = datetime.strptime(metadata['release_date'], '%Y-%m-%d').date()
             new_name = new_name.replace('release_date', release_date_obj.strftime(self.__release_date_format))
@@ -154,7 +154,7 @@ class Renamer(object):
             new_name = new_name.replace('tags_list_str', tags_list_str)
 
         # 文件名中不能包含 Windows 系统的保留字符
-        if self.mode == 'RENAME':
+        if self.__mode == 'RENAME':
             if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
                 new_name = new_name.translate(new_name.maketrans(
                     WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
@@ -201,20 +201,20 @@ class Renamer(object):
 
             # 重命名文件夹
             new_basename = self.__compile_new_name(metadata)
-            new_folder_path = os.path.join(dirname, new_basename) if self.mode == 'RENAME' else os.path.join(self.move_root, new_basename)
+            new_folder_path = os.path.join(dirname, new_basename) if self.__mode == 'RENAME' else os.path.join(self.__move_root, new_basename)
             try:
-                if self.mode == 'MOVE':
+                if self.__mode == 'MOVE':
                     # print('MOVE', folder_path, new_folder_path)
                     move_folder(folder_path, new_folder_path)
-                elif self.mode == 'LINK':
+                elif self.__mode == 'LINK':
                     # print('LINK', folder_path, new_folder_path)
                     copy_with_symlink(folder_path, os.path.join(new_folder_path, basename))
                 else:
                     os.rename(folder_path, new_folder_path)
-                Renamer.logger.info(f'[{rjcode}] -> 重命名({self.mode})成功："{os.path.normpath(new_folder_path)}"')
+                Renamer.logger.info(f'[{rjcode}] -> 重命名({self.__mode})成功："{os.path.normpath(new_folder_path)}"')
             except FileExistsError as err:
                 filename2 = os.path.normpath(err.filename2)
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名({self.mode})失败[FileExistsError]：{err.strerror}目标路径："{filename2}"\n')
+                Renamer.logger.warning(f'[{rjcode}] -> 重命名({self.__mode})失败[FileExistsError]：{err.strerror}目标路径："{filename2}"\n')
                 continue
             except OSError as err:
                 err_msg = f'[{rjcode}] -> 重命名失败[OSError]：{str(err)}'
