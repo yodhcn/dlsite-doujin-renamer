@@ -8,6 +8,7 @@ from requests.exceptions import RequestException, ConnectionError, HTTPError, Ti
 
 from scaner import Scaner
 from scraper import WorkMetadata, Scraper
+from ostool import move_folder, copy_with_symlink, normalize_path
 
 import stat
 
@@ -26,6 +27,9 @@ import win32api
 WINDOWS_RESERVED_CHARACTER_PATTERN = re.compile(r'[\\/*?:"<>|]')
 WINDOWS_RESERVED_CHARACTER_PATTERN_str = r'\/:*?"<>|'  # 半角字符，原
 WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str = '＼／：＊？＂＜＞｜'  # 全角字符，替
+WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN = re.compile(r'[*?:"<>|]')
+WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_str = r':*?"<>|'  # 半角字符，原
+WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_replace_str = '：＊？＂＜＞｜'  # 全角字符，替
 
 
 def _get_logger():
@@ -72,6 +76,9 @@ class Renamer(object):
             age_cat_left: str,
             age_cat_right: str,
             age_cat_ignore_r18: bool,
+            mode: str,  # RENAME/MOVE/LINK
+            move_root: str,
+            move_template: str
     ):
         if 'rjcode' not in template:
             raise ValueError  # 重命名不能丢失 rjcode
@@ -93,6 +100,9 @@ class Renamer(object):
         self.age_cat_left = age_cat_left
         self.age_cat_right = age_cat_right
         self.age_cat_ignore_r18 = age_cat_ignore_r18
+        self.mode = mode
+        self.move_root = move_root
+        self.move_template = move_template
 
     def __compile_new_name(self, metadata: WorkMetadata):
         """
@@ -102,7 +112,7 @@ class Renamer(object):
             if self.__exclude_square_brackets_in_work_name_flag \
             else metadata['work_name']
 
-        template = self.__template
+        template = self.__template if self.mode == 'RENAME' else self.move_template
         new_name = template.replace('rjcode', metadata['rjcode'])
         new_name = new_name.replace('work_name', work_name)
         new_name = new_name.replace('maker_id', metadata['maker_id'])
@@ -144,13 +154,22 @@ class Renamer(object):
             new_name = new_name.replace('tags_list_str', tags_list_str)
 
         # 文件名中不能包含 Windows 系统的保留字符
-        if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
-            new_name = new_name.translate(new_name.maketrans(
-                WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
-        else:  # 直接移除
-            new_name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', new_name)
+        if self.mode == 'RENAME':
+            if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+                new_name = new_name.translate(new_name.maketrans(
+                    WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
+            else:  # 直接移除
+                new_name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', new_name)
+            new_name = new_name.strip()
+        else:
+            if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+                new_name = new_name.translate(new_name.maketrans(
+                    WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_str, WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_replace_str))
+            else:  # 直接移除
+                new_name = WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN.sub('', new_name)
+            new_name = normalize_path(new_name)
 
-        return new_name.strip()
+        return new_name
 
     @staticmethod
     def __handle_request_exception(rjcode: str, task: str, err: RequestException):
@@ -180,29 +199,44 @@ class Renamer(object):
                 Renamer.__handle_request_exception(rjcode, '爬取元数据', err)  # 爬取元数据失败
                 continue
 
+            # 重命名文件夹
+            new_basename = self.__compile_new_name(metadata)
+            new_folder_path = os.path.join(dirname, new_basename) if self.mode == 'RENAME' else os.path.join(self.move_root, new_basename)
+            try:
+                if self.mode == 'MOVE':
+                    # print('MOVE', folder_path, new_folder_path)
+                    move_folder(folder_path, new_folder_path)
+                elif self.mode == 'LINK':
+                    # print('LINK', folder_path, new_folder_path)
+                    copy_with_symlink(folder_path, os.path.join(new_folder_path, basename))
+                else:
+                    os.rename(folder_path, new_folder_path)
+                Renamer.logger.info(f'[{rjcode}] -> 重命名({self.mode})成功："{os.path.normpath(new_folder_path)}"')
+            except FileExistsError as err:
+                filename2 = os.path.normpath(err.filename2)
+                Renamer.logger.warning(f'[{rjcode}] -> 重命名({self.mode})失败[FileExistsError]：{err.strerror}目标路径："{filename2}"\n')
+                continue
+            except OSError as err:
+                err_msg = f'[{rjcode}] -> 重命名失败[OSError]：{str(err)}'
+                if err.winerror == 1314:
+                    err_msg = err_msg + "\n" + "Windows 下创建符号链接目录需要管理员权限，或启用 设置-系统-开发者选项-开发人员模式"
+                Renamer.logger.error(err_msg + "\n")
+                break
+            except Exception as err:
+                print()
+
             # 修改封面
             if self.__make_folder_icon:
                 try:
-                    icon_name, _ = Renamer.changeIcon(self, rjcode, metadata['cover_url'], folder_path)  # 修改封面
+                    icon_name, _ = Renamer.changeIcon(self, rjcode, metadata['cover_url'], new_folder_path)  # 修改封面
                 except RequestException as err:
                     Renamer.__handle_request_exception(rjcode, '下载封面图', err)  # 下载封面图失败
                     continue
                 except OSError as err:
-                    Renamer.logger.error(f'[{rjcode}] -> 修改封面失败[OSError]：{str(err)}\n')
+                    Renamer.logger.error(f'[{rjcode}] -> 修改封面失败[OSError]：{str(err)}')
                     continue
 
-            # 重命名文件夹
-            new_basename = self.__compile_new_name(metadata)
-            new_folder_path = os.path.join(dirname, new_basename)
-            try:
-                os.rename(folder_path, new_folder_path)
-                Renamer.logger.info(f'[{rjcode}] -> 重命名成功："{os.path.normpath(new_folder_path)}"\n')
-            except FileExistsError as err:
-                filename = os.path.normpath(err.filename)
-                filename2 = os.path.normpath(err.filename2)
-                Renamer.logger.warning(f'[{rjcode}] -> 重命名失败[FileExistsError]：{err.strerror}："{filename}" -> "{filename2}"\n')
-            except OSError as err:
-                Renamer.logger.error(f'[{rjcode}] -> 重命名失败[OSError]：{str(err)}\n')
+            Renamer.logger.info(f'[{rjcode}] -> 处理结束\n')
 
     # 修改文件夹封面
     def changeIcon(self, rjcode: str, cover_url: str, icon_dir: str):

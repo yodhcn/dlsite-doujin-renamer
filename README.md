@@ -40,7 +40,10 @@
   "renamer_age_cat_map_r18": "R18",
   "renamer_age_cat_left": "(",
   "renamer_age_cat_right": ")",
-  "renamer_age_cat_ignore_r18": false
+  "renamer_age_cat_ignore_r18": true,
+  "renamer_mode": "RENAME",
+  "renamer_move_root": "RENAMER_MOVE_ROOT",
+  "renamer_move_template": "maker_name/age_cat[rjcode] work_name cv_list_str"
 }
 ```
 - `scaner_max_depth` 扫描器的扫描深度
@@ -99,7 +102,14 @@
       `work_name = "[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
   - `"renamer_age_cat_ignore_r18": false`<br/>
       `work_name = "(R18)[桃色CODE] 道草屋 なつな2 隣の部屋のたぬきさん。 (RJ363096)"`
-
+- `renamer_mode` 命名器的工作模式
+  - `RENAME` 重命名，使用模板 `renamer_template`
+  - `MOVE` 移动到指定根目录，使用模板 `renamer_move_template`
+  - `LINK` 复制快捷方式到指定根目录（保持源文件夹不变，适合需要做种的使用场景），使用模板 `renamer_move_template`
+- `renamer_move_root` `MOVE`与`LINK`工作模式下的指定根目录，**注意路径配置使用`/`分隔符**，例如 `"renamer_move_root": "D:/音声库"`
+- `renamer_move_template` `MOVE`与`LINK`工作模式下的命名模板。<br/>
+例如：`"renamer_move_template": "maker_name/[rjcode] work_name"` `"renamer_move_root": "D:/音声库"`<br/>
+源路径：`D:/道草屋/RJ363096` → 目标路径：`D:/音声库/桃色CODE/[RJ363096] 道草屋 なつな2 隣の部屋のたぬきさん。`
 
 【注】**请不要使用 Windows 系统自带的「记事本」编辑配置文件**，建议使用 [Notepad3](https://www.rizonesoft.com/downloads/notepad3/)、[Notepad++](https://notepad-plus-plus.org/) 或 [Visual Studio Code](https://code.visualstudio.com/) 等专业的文本编辑器。本软件的配置文件 `config.json` 使用不带 BOM 的标准 UTF-8 编码，但在 Windows 记事本的语境中，所谓的「UTF-8」指的是带 BOM 的 UTF-8。因此，用 Windows 系统自带的记事本编辑配置文件后，会导致本软件无法正确读取配置。
 
