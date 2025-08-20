@@ -121,3 +121,4 @@ dmypy.json
 
 cache.db
 config.json
+RENAMER_MOVE_ROOT

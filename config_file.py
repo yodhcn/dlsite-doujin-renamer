@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from typing import Annotated, Optional, Union
+from typing import Annotated, Optional, Union, Literal
 from pydantic import Field
 from jsonschema import Draft202012Validator
 from typing_extensions import TypedDict
@@ -9,7 +9,7 @@ from pydantic import TypeAdapter, ConfigDict
 from scraper import Locale
 
 FilenameStr = Annotated[str, Field(pattern=r'^[^\/:*?"<>|]*$', description="""不能含有系统保留字[^\/:*?`<>|]*""")]
-
+RjcodeStr = Annotated[str, Field(pattern=re.compile(r".*rjcode.*"), description='template 应是一个包含 "rjcode" 的字符串')]
 
 class Config(TypedDict):
     __pydantic_config__ = ConfigDict()
@@ -23,7 +23,7 @@ class Config(TypedDict):
     scraper_sleep_interval: int
     scraper_http_proxy: Optional[str]
     # renamer
-    renamer_template: Annotated[str, Field(pattern=re.compile(r".*rjcode.*"), description='renamer_template 应是一个包含 "rjcode" 的字符串')]
+    renamer_template: RjcodeStr
     renamer_release_date_format: str # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
     renamer_exclude_square_brackets_in_work_name_flag: bool
     renamer_illegal_character_to_full_width_flag: bool
@@ -40,6 +40,9 @@ class Config(TypedDict):
     renamer_age_cat_left: FilenameStr
     renamer_age_cat_right: FilenameStr
     renamer_age_cat_ignore_r18: bool
+    renamer_mode: Literal["RENAME", "MOVE", "LINK"]
+    renamer_move_root: str
+    renamer_move_template: RjcodeStr
 
 
 ta = TypeAdapter(Config)
@@ -71,7 +74,10 @@ DEFAULT_CONFIG: Config = {
     'renamer_age_cat_map_r18': "R18",
     'renamer_age_cat_left': "(",
     'renamer_age_cat_right': ")",
-    'renamer_age_cat_ignore_r18': True
+    'renamer_age_cat_ignore_r18': True,
+    'renamer_mode': 'RENAME',
+    'renamer_move_root': 'RENAMER_MOVE_ROOT',
+    'renamer_move_template': 'maker_name/age_cat[rjcode] work_name cv_list_str'
 }
 
 
