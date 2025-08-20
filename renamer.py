@@ -222,8 +222,6 @@ class Renamer(object):
                     err_msg = err_msg + "\n" + "Windows 下创建符号链接目录需要管理员权限，或启用 设置-系统-开发者选项-开发人员模式"
                 Renamer.logger.error(err_msg + "\n")
                 break
-            except Exception as err:
-                print()
 
             # 修改封面
             if self.__make_folder_icon:
