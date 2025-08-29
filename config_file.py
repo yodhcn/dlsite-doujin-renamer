@@ -62,7 +62,7 @@ DEFAULT_CONFIG: Config = {
     'renamer_template': 'age_cat[maker_name][rjcode] work_name cv_list_str',
     'renamer_release_date_format': '%y%m%d',
     'renamer_exclude_square_brackets_in_work_name_flag': True,
-    'renamer_illegal_character_to_full_width_flag': False,
+    'renamer_illegal_character_to_full_width_flag': True,
     'renamer_make_folder_icon': True,
     'renamer_remove_jpg_file': True,
     'renamer_delimiter': " ",

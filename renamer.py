@@ -108,19 +108,41 @@ class Renamer(object):
         self.__move_root = move_root
         self.__move_template = move_template
 
+    def __format_filename_str(self, name: str):
+        if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+            name = name.translate(name.maketrans(
+                WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
+        else:  # 直接移除
+            name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', name)
+        return name.strip()
+
+
     def __compile_new_name(self, metadata: WorkMetadata):
         """
         根据作品的元数据编写出新的文件名
         """
-        work_name = re.sub(r'【.*?】', '', metadata['work_name']).strip() \
-            if self.__exclude_square_brackets_in_work_name_flag \
-            else metadata['work_name']
+        if self.__mode == 'RENAME':
+            template = self.__template
+            template = self.__format_filename_str(template)
+        else:
+            template = self.__move_template
+            if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+                template = template.translate(template.maketrans(
+                    WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_str, WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN_replace_str))
+            else:  # 直接移除
+                template = WINDOWS_RESERVED_CHARACTER_IGNORE_SLASH_PATTERN.sub('', template)
+            template = template.strip()
 
-        template = self.__template if self.__mode == 'RENAME' else self.__move_template
+        work_name = self.__format_filename_str(metadata['work_name'])
+        if self.__exclude_square_brackets_in_work_name_flag:
+            work_name = re.sub(r'【.*?】', '', work_name).strip()
+        maker_name = self.__format_filename_str(metadata['maker_name'])
+        series_name = self.__format_filename_str(metadata['series_name'])
+
         new_name = template.replace('rjcode', metadata['rjcode'])
         new_name = new_name.replace('work_name', work_name)
         new_name = new_name.replace('maker_id', metadata['maker_id'])
-        new_name = new_name.replace('maker_name', metadata['maker_name'])
+        new_name = new_name.replace('maker_name', maker_name)
         if 'age_cat' in template:
             if self.__age_cat_ignore_r18 and metadata['age_category'] == 'R18':
                 new_name = new_name.replace('age_cat', "")
@@ -133,19 +155,19 @@ class Renamer(object):
                     age_cat = self.__age_cat_map_r18
                 new_name = new_name.replace('age_cat', self.__age_cat_left + age_cat + self.__age_cat_right)
         if 'series_name' in template:
-            if metadata['series_name']:
-                new_name = new_name.replace('series_name', self.__series_name_left + metadata['series_name'] + self.__series_name_right)
+            if series_name:
+                new_name = new_name.replace('series_name', self.__series_name_left + series_name + self.__series_name_right)
             else:
                 new_name = new_name.replace('series_name', '')
         if 'release_date' in template:
             release_date_obj = datetime.strptime(metadata['release_date'], '%Y-%m-%d').date()
             new_name = new_name.replace('release_date', release_date_obj.strftime(self.__release_date_format))
 
-        cv_list = metadata['cvs']  # cv列表
+        cv_list = list(map(self.__format_filename_str, metadata['cvs']))  # cv列表
         cv_list_str = self.__cv_list_left + self.__delimiter.join(cv_list) + self.__cv_list_right if len(cv_list) > 0 else ''
         new_name = new_name.replace('cv_list_str', cv_list_str)
 
-        if "tags_list_str" in self.__template:  # 标签列表
+        if "tags_list_str" in template:  # 标签列表
             tags_list = []
             tags_list_flag = []
             for i in self.__tags_option['ordered_list']:  # ordered_list中存在的标签
@@ -159,6 +181,7 @@ class Renamer(object):
                 if not i in tags_list_flag:
                     tags_list.append(i)
             tags_list = tags_list[: self.__tags_option['max_number']]  # 数量限制
+            tags_list = list(map(self.__format_filename_str, tags_list))
             tags_list_str = self.__delimiter.join(tags_list)  # 转字符串，加分隔符
             new_name = new_name.replace('tags_list_str', tags_list_str)
 
