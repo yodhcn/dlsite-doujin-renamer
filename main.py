@@ -5,6 +5,7 @@ import sys
 from json import JSONDecodeError
 from threading import Thread
 from typing import Optional, Callable
+import traceback
 
 import wx
 
@@ -15,7 +16,7 @@ from scraper import Locale, CachedScraper
 from my_frame import MyFrame
 from wx_log_handler import EVT_WX_LOG_EVENT, WxLogHandler
 
-VERSION = '0.3.1'
+VERSION = '0.3.2'
 
 
 class MyFileDropTarget(wx.FileDropTarget):
@@ -198,6 +199,7 @@ class AppFrame(MyFrame):
                 renamer.rename(root_path)
             except Exception as err:
                 Renamer.logger.error(f'[Unexpected exception] {str(err)}\n')
+                traceback.print_exc()
                 break
 
         self.__before_worker_thread_end()

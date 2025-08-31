@@ -109,12 +109,15 @@ class Renamer(object):
         self.__move_template = move_template
 
     def __format_filename_str(self, name: str):
-        if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
-            name = name.translate(name.maketrans(
-                WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
-        else:  # 直接移除
-            name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', name)
-        return name.strip()
+        if name:
+            if self.__renamer_illegal_character_to_full_width_flag:  # 半角转全角
+                name = name.translate(name.maketrans(
+                    WINDOWS_RESERVED_CHARACTER_PATTERN_str, WINDOWS_RESERVED_CHARACTER_PATTERN_replace_str))
+            else:  # 直接移除
+                name = WINDOWS_RESERVED_CHARACTER_PATTERN.sub('', name)
+            return name.strip()
+        else:
+            return name
 
 
     def __compile_new_name(self, metadata: WorkMetadata):
