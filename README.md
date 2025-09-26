@@ -47,7 +47,7 @@
 }
 ```
 - `scaner_max_depth` 扫描器的扫描深度
-- `scraper_locale` 刮削器的刮削元数据的语言（`["en_us", "ja_jp", "ko_kr", "zh_cn", "zh_tw"]` 中的一个）
+- `scraper_locale` 刮削器的刮削元数据的语言（`["en_us", "ja_jp", "ko_kr", "zh_cn", "zh_tw"]` 中的一个，默认 `"ja_jp"`）。**注意：修改此项配置后需要删除 `cache.db` 缓存文件，以应用更改**
 - `scraper_connect_timeout` 刮削器的 [requests 连接超时](https://docs.python-requests.org/zh_CN/latest/user/advanced.html#timeout)时间（秒）
 - `scraper_connect_timeout` 刮削器的 [requests 读取超时](https://docs.python-requests.org/zh_CN/latest/user/advanced.html#timeout)时间（秒）
 - `scraper_sleep_interval` 刮削器的请求网页的时间间隔（秒）
